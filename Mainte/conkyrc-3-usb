@@ -1,0 +1,53 @@
+conky.config = {
+    background = false,
+    font = 'FuraCode Nerd Font:pixelsize=11',
+    use_xft = true,
+    xftalpha = 1.0,
+    update_interval = 60,
+    total_run_times = 0,
+    own_window = true,
+    own_window_transparent = true,
+    own_window_type = 'dock',
+    own_window_class = 'Conky',
+    own_window_argb_visual = true,
+    own_window_argb_value = 255,
+    own_window_colour = '#000',
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+    double_buffer = true,
+    draw_shades = false,
+    draw_outline = false,
+    draw_borders = false,
+    draw_graph_borders = true,
+    stippled_borders = 0,
+    border_width = 0,
+    default_color = '#BEC8CB',
+    default_shade_color = '#BEC8CB',
+    default_outline_color = '#BEC8CB',
+    alignment = 'top_left',
+    gap_x = 650,
+    gap_y = 620,
+    no_buffers = true,
+    cpu_avg_samples = 1,
+    net_avg_samples = 1,
+    use_spacer = 'none',
+    uppercase = true,
+    minimum_width = 1200,
+    minimum_height = 120,
+};
+
+conky.text = [[
+#leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 1200}│
+${offset 738}${offset -3} ┌── USB ${offset 3}─────────────────────────────────────────────────────────┘
+${texeci 60 bash ./scripts/usb.sh }
+]];

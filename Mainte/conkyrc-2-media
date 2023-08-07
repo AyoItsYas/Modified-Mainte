@@ -1,0 +1,52 @@
+conky.config = {
+    background = false,
+    font = 'FuraCode Nerd Font:pixelsize=11',
+    use_xft = true,
+    xftalpha = 1.0,
+    update_interval = 1,
+    own_window = true,
+    own_window_transparent = true,
+    own_window_type = 'dock',
+    own_window_class = 'Conky',
+    own_window_argb_visual = true,
+    own_window_argb_value = 255,
+    own_window_colour = '#000',
+    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+    double_buffer = true,
+    draw_shades = false,
+    draw_outline = false,
+    draw_borders = false,
+    draw_graph_borders = true,
+    stippled_borders = 0,
+    border_width = 0,
+    default_color = '#BEC8CB',
+    default_shade_color = '#BEC8CB',
+    default_outline_color = '#BEC8CB',
+    alignment = 'top_left',
+    gap_x = 125,
+    gap_y = 630,
+    no_buffers = true,
+    cpu_avg_samples = 1,
+    net_avg_samples = 1,
+    use_spacer = 'none',
+    uppercase = true,
+    minimum_width = 1200,
+    minimum_height = 120,
+    default_bar_width=100,
+    default_bar_height=7,
+};
+
+conky.text = [[
+#leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
+${offset 1670}───┐
+${offset 1670}   │
+${offset 1670}   │
+${offset 1670}   │
+${offset 1670}   │
+${offset 1670}   │
+${offset 1670}   │
+${offset 1670}   │
+#${alignr 1}${exec bash ./scripts/media.sh len} ${execibar 1 bash ./scripts/media.sh perc} ── AUDIO ──────┘
+${alignr 1}${texeci 1 bash ./scripts/media.sh} ${execibar 5 bash ./scripts/media.sh perc} --- <${texeci 1 bash ./scripts/media.sh player}> ── AUDIO ──────┘
+#${alignr 1}${exec bash ./scripts/test.sh}
+]];
