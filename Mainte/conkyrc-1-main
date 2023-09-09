@@ -3,7 +3,7 @@ conky.config = {
     font = 'FuraCode Nerd Font:pixelsize=11',
     use_xft = true,
     xftalpha = 1.0,
-    update_interval = 5,
+    update_interval = 1,
     own_window = true,
     own_window_transparent = true,
     own_window_type = 'dock',
@@ -56,7 +56,7 @@ ${alignr 98}${execi 0 xdpyinfo | awk '/dimensions/{print $2}'} : res ─┘
 ${alignr 40}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ──────────┐
 ${voffset 5}
 ${alignr 105}┌─────────────────────────────────┐
-${alignr 105}│  ${execi 0  cat /proc/cpuinfo|grep 'model name'|sed -e 's/model name.*: //'|uniq|cut -c 1-36|sed 's/(R)//g'|sed 's/(TM)//g'|sed 's/CPU     //g'}  │
+${alignr 105}│  ${execi 3600 cat /proc/cpuinfo|grep 'model name'|sed -e 's/model name.*: //'|uniq|cut -c 1-36|sed 's/(R)//g'|sed 's/(TM)//g'|sed 's/CPU     //g'}  │
 ${alignr 105}├- -  --  --  --  --  --  --  -- -┤
 ${alignr 105}│    core0 <${exec sensors | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
 ${alignr 105}├─────────────────────────────────┤
@@ -72,15 +72,16 @@ ${alignr 98}└───── cpu ───────
 ${voffset 0}
 ${alignr 75}$memperc% | $mem / $memmax ${membar 7,100} ───── ram ────┐
 ${voffset 31}
-${alignr 78}${wireless_link_qual wlp2s0}% (${addr wlp2s0}) ${wireless_essid wlp2s0} --- wlan ──┬── network ─────
-${alignr 190}(${addr enp0s31f6}) ---  lan ──┤
-${alignr 190}(${addr tun0}) ---  vpn ──┘
-#${voffset -65}
+${alignr 78}${execi 60 bash ./scripts/network.sh ip } - ${exec ./scripts/network.sh } ─┬─── network ─────
+${alignr 197}│
+${alignr 197}${execi 60 bash ./scripts/network.sh dns } :     dns ─┤
+${alignr 197}${execi 60 bash ./scripts/network.sh gtw } : gateway ─┘
+${voffset -13}
 #${offset 325}${upspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3} ${downspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3}
 #${offset 385}UP                ${offset -2} DOWN
-${voffset 38}
-${alignr 101}${execi 60 acpi | grep "Battery 0" | tr -d ',' } ${battery_bar 7,100 BAT0} ──── bat ────────
+${voffset 11}
+${alignr 101}${execi 60 acpi | grep "Battery 0" | tr -d ',' } ${battery_bar 7,100 BAT0} ──── bat ────
 ${voffset 23}
-${alignr 5}(/mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/)   Hitachi HTS543232A7A384 --- ${execi 3600 bash ./scripts/storage.sh /mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/ } ─┬───── strg ────────
-${alignr 138}(/) SanDisk SD8SN8U-256G-1006 --- ${execi 3600 bash ./scripts/storage.sh / } ─┘
+${alignr 5}[/mnt/home/]   Hitachi HTS543232A7A384 --- ${execi 3600 bash ./scripts/storage.sh /mnt/home/ } ─┬───── strg ────────
+${alignr 138}[/] SanDisk SD8SN8U-256G-1006 --- ${execi 3600 bash ./scripts/storage.sh / } ─┘
 ]];

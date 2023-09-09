@@ -47,6 +47,6 @@ ${offset 1670}   │
 ${offset 1670}   │
 ${offset 1670}   │
 #${alignr 1}${exec bash ./scripts/media.sh len} ${execibar 1 bash ./scripts/media.sh perc} ── AUDIO ──────┘
-${alignr 1}${texeci 1 bash ./scripts/media.sh} ${execibar 5 bash ./scripts/media.sh perc} --- <${texeci 1 bash ./scripts/media.sh player}> ── AUDIO ──────┘
+${alignr 1}${exec bash ./scripts/media.bash} ${execbar bash ./scripts/media.bash perc} : ${texeci 1 bash ./scripts/media.bash player} ── AUDIO ──────┘
 #${alignr 1}${exec bash ./scripts/test.sh}
 ]];
