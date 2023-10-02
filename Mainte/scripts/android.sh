@@ -3,7 +3,7 @@
 OUT=$(adb devices -l | grep "model")
 
 if [ -z "$OUT" ]; then
-  echo "No device connected"
+  echo "na"
   exit 0
 else
   :

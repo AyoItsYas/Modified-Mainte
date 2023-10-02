@@ -32,6 +32,8 @@ conky.config = {
     uppercase = true,
     minimum_width = 1024,
     minimum_height = 640,
+    default_bar_width=100,
+    default_bar_height=7,
 };
 
 conky.text = [[
@@ -39,43 +41,43 @@ conky.text = [[
 #leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
 # x5 ─────
 # Computer Info
-${alignr 0}┌──────────────────── ${nodename} ──────────
-${alignr 194}${offset -2 }├─ user   : ${uid_name 1000}
-${alignr 194}${offset 110}├─ kernel : ${kernel}
-${alignr 194}${offset 75}├─ distro : ${execi 600 lsb_release -ds | sed 's/"//g'}
-${alignr 110}${offset 19}└─ uptime : ${exec uptime | awk -F, '{print $1}' | awk '{gsub(/^ +| +$/,"")}1' | awk '{ printf "%-21s", $0 }'}
+${alignr 5}HP EliteBook 850 G3 --- ${uid_name 1000}@${nodename} :   host ${offset 2}─┬────────────────
+${alignr 115}│
+${alignr 115}${kernel} : kernel ─┤
+${alignr 115}${execi 600 lsb_release -ds | sed 's/"//g'} : distro ─┤
+${alignr 115}${exec uptime | awk -F, '{print $1}' | awk '{gsub(/^ +| +$/,"")}1'} : uptime ─┘
+
+
 # Graphics Info
+${alignr 36}[3520x1080] --- Radeon R7 M365X @ 825 MHz :   gpu ─┬───────────
+${alignr 113}│
+${alignr 113}${execi 5 bash ./scripts/gpu-stats.sh vram } :  vram ─┤
+${alignr 113}${execi 5 bash ./scripts/gpu-stats.sh temp } --- ${execi 5 bash ./scripts/gpu-stats.sh clock } : clock ─┘
 
 
-${alignr 35}${execi 0 lspci | grep 'ATI' | awk -F ': ' '{print $2}' | sed 's/Advanced Micro Devices, Inc./ /g' } : gpu ─┬─────────
-${alignr 98}${execi 0 xdpyinfo | awk '/dimensions/{print $2}'} : res ─┘
-
-
-
-
-${alignr 40}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ──────────┐
+${alignr 36}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ────────────┐
 ${voffset 5}
-${alignr 105}┌─────────────────────────────────┐
-${alignr 105}│  ${execi 3600 cat /proc/cpuinfo|grep 'model name'|sed -e 's/model name.*: //'|uniq|cut -c 1-36|sed 's/(R)//g'|sed 's/(TM)//g'|sed 's/CPU     //g'}  │
-${alignr 105}├- -  --  --  --  --  --  --  -- -┤
-${alignr 105}│    core0 <${exec sensors | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
-${alignr 105}├─────────────────────────────────┤
-${alignr 105}│ processes - ${exec printf "%-5s" $(ps -e --no-headers | wc -l)}    <${exec hwinfo --cpu | grep Clock | grep -oE '[0-9]+' | awk '{ sum += $1 } END { avg = sum / NR / 1000; printf "%4.2f GHz\n", avg }'}> │
-${alignr 105}├- --  --  --  --  -- --  --  -- -┤
-${alignr 105}├─ p1 <${top name 1}   ${top cpu 1}> │
-${alignr 105}├─ p2 <${top name 2}   ${top cpu 2}> │
-${alignr 105}├─ p3 <${top name 3}   ${top cpu 3}> │
-${alignr 105}├─ p4 <${top name 4}   ${top cpu 4}> │
-${alignr 105}├─ p5 <${top name 5}   ${top cpu 5}> │
-${alignr 105}└─────────────────┬───────────────┘
-${alignr 98}└───── cpu ───────
+${alignr 125}┌─────────────────────────────────┐
+${alignr 125}│  ${execi 3600 cat /proc/cpuinfo|grep 'model name'|sed -e 's/model name.*: //'|uniq|cut -c 1-36|sed 's/(R)//g'|sed 's/(TM)//g'|sed 's/CPU     //g'}  │
+${alignr 125}├- -  --  --  --  --  --  --  -- -┤
+${alignr 125}│    core0 <${exec sensors | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
+${alignr 125}├─────────────────────────────────┤
+${alignr 125}│ processes - ${exec printf "%-5s" $(ps -e --no-headers | wc -l)}    <${exec hwinfo --cpu | grep Clock | grep -oE '[0-9]+' | awk '{ sum += $1 } END { avg = sum / NR / 1000; printf "%4.2f GHz\n", avg }'}> │
+${alignr 125}├- --  --  --  --  -- --  --  -- -┤
+${alignr 125}├─ p1 <${top name 1}   ${top cpu 1}> │
+${alignr 125}├─ p2 <${top name 2}   ${top cpu 2}> │
+${alignr 125}├─ p3 <${top name 3}   ${top cpu 3}> │
+${alignr 125}├─ p4 <${top name 4}   ${top cpu 4}> │
+${alignr 125}├─ p5 <${top name 5}   ${top cpu 5}> │
+${alignr 125}└─────────────────┬───────────────┘
+${alignr 97}└─────── cpu ────────
 ${voffset 0}
-${alignr 75}$memperc% | $mem / $memmax ${membar 7,100} ───── ram ────┐
+${alignr 75}$mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
 ${voffset 31}
-${alignr 78}${execi 60 bash ./scripts/network.sh ip } - ${exec ./scripts/network.sh } ─┬─── network ─────
+${alignr 78}${execi 60 bash ./scripts/network.bash ip } - ${execi 60 bash ./scripts/network.bash } ─┬─── network ─────
 ${alignr 197}│
-${alignr 197}${execi 60 bash ./scripts/network.sh dns } :     dns ─┤
-${alignr 197}${execi 60 bash ./scripts/network.sh gtw } : gateway ─┘
+${alignr 197}${execi 60 bash ./scripts/network.bash dns } :     dns ─┤
+${alignr 197}${execi 60 bash ./scripts/network.bash gtw } : gateway ─┘
 ${voffset -13}
 #${offset 325}${upspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3} ${downspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3}
 #${offset 385}UP                ${offset -2} DOWN
