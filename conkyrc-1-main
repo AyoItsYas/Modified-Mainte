@@ -45,7 +45,7 @@ ${alignr 5}HP EliteBook 850 G3 --- ${uid_name 1000}@${nodename} :   host ${offse
 ${alignr 115}│
 ${alignr 115}${kernel} : kernel ─┤
 ${alignr 115}${execi 600 lsb_release -ds | sed 's/"//g'} : distro ─┤
-${alignr 115}${exec uptime | awk -F, '{print $1}' | awk '{gsub(/^ +| +$/,"")}1'} : uptime ─┘
+${alignr 115}${exec uptime | awk -F, '{print $1}' | awk '{gsub(/^ +| +$/,"")}1' } : uptime ─┘
 
 
 # Graphics Info
@@ -72,12 +72,12 @@ ${alignr 125}├─ p5 <${top name 5}   ${top cpu 5}> │
 ${alignr 125}└─────────────────┬───────────────┘
 ${alignr 97}└─────── cpu ────────
 ${voffset 0}
-${alignr 75}$mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
+${alignr 75}$swap / $swapmax ${swapperc}% swap --- $mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
 ${voffset 31}
-${alignr 78}${execi 60 bash ./scripts/network.bash ip } - ${execi 60 bash ./scripts/network.bash } ─┬─── network ─────
+${alignr 78}${execi 30 bash ./scripts/network.bash ip } - ${execi 30 bash ./scripts/network.bash } ─┬─── network ─────
 ${alignr 197}│
-${alignr 197}${execi 60 bash ./scripts/network.bash dns } :     dns ─┤
-${alignr 197}${execi 60 bash ./scripts/network.bash gtw } : gateway ─┘
+${alignr 197}${execi 30 bash ./scripts/network.bash dns } :     dns ─┤
+${alignr 197}${execi 30 bash ./scripts/network.bash gtw } : gateway ─┘
 ${voffset -13}
 #${offset 325}${upspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3} ${downspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3}
 #${offset 385}UP                ${offset -2} DOWN

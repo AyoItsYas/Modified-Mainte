@@ -6,6 +6,19 @@ OUT=$(lsusb)
 BUSN=$(echo "$OUT" | awk '{print $2}' | sort -u | wc -l)
 DEVICESN=$(echo "$OUT" | wc -l)
 
+USBGUARD_OUTPUT=$(usbguard list-devices)
+
+# fill should be the number of characters the device number takes for example if DEVICESN=10 then FILL=2 if DEVICESN=100 then FILL=3
+if [ $DEVICESN -lt 10 ]; then
+  FILL=1
+elif [ $DEVICESN -lt 100 ]; then
+  FILL=2
+elif [ $DEVICESN -lt 1000 ]; then
+  FILL=3
+else
+  FILL=4
+fi
+
 MAXLEN=0
 while read -r line; do
   IFS=' ' read -r -a array <<< "$line"
@@ -50,7 +63,18 @@ while [ $i -le $BUSN ]; do
     DEVICE_NAME=$(echo "$line" | awk '{for(i=7;i<=NF;++i)printf $i""FS;print""}')
     DEVICE_NAME="$(printf "%"$MAXLEN"s" "$DEVICE_NAME" | sed -e 's/[[:space:]]*$//')"
 
-    echo "<${array[5]} $DEVICE_NAME> D$j ─$PRE           $CN_PRE" | awk '{ printf "%113s\n", $0 }'
+    k=$(printf "%0${FILL}d" $j)
+
+    USBGUARD_STATUS=$(echo "$USBGUARD_OUTPUT" | grep "${array[5]}" | awk '{print $2}')
+
+    if [ "$USBGUARD_STATUS" = "allow" ]; then
+      USBGUARD_STATUS="allowed"
+    else
+      USBGUARD_STATUS="blocked"
+    fi
+
+    echo "<${array[5]} $DEVICE_NAME> $USBGUARD_STATUS $k ─$PRE           $CN_PRE" | awk '{ printf "%113s\n", $0 }'
+    sleep 0.05
 
     if [ $j -eq $DEVICESN ]; then
       break

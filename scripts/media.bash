@@ -3,7 +3,7 @@
 PLAYERS=$(playerctl -l)
 
 if [[ -z "$PLAYERS" ]]; then
-  echo "No media playback"
+  echo "na"
   exit 0
 fi
 
@@ -24,9 +24,9 @@ for PLAYER in $PLAYERS; do
   fi
 done
 
-
 if [[ -z "$ACTIVE_PLAYER" ]]; then
   ACTIVE_PLAYER=$(echo "$PLAYERS" | head -n 1)
+  ACTIVE_PLAYER_NAME=$ACTIVE_PLAYER
 fi
 
 if [[ $1 == "player" ]]; then
@@ -57,10 +57,15 @@ else
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }} - {{ artist }}")
     fi
 
+
     HASH=$(hash "$ACTIVE_PLAYER")
     MAX_LEN=50
 
-    SCROLL_STEP=1
+    if [[ ! -f "/tmp/conky-media-scroll-step" ]]; then
+      echo "1" > /tmp/conky-media-scroll-step
+    fi
+
+    SCROLL_STEP=$(cat /tmp/conky-media-scroll-step)
     SCROLL_SEP="....."
     SCROLL_INDEX="/tmp/conky-media-scroll-index-$HASH"
 
@@ -75,25 +80,25 @@ else
       NAME="${NAME:$SCROLL:$MAX_LEN}"
       NAME="[${NAME:0:$MAX_LEN}]"
 
-      if [[ $SCROLL -gt ${#NAME} ]]; then
-        SCROLL=0
+      STATUS=$(playerctl -p "$ACTIVE_PLAYER" status)
+      if [[ $STATUS == "Paused" ]]; then
+        SCROLL=$SCROLL
+      else
+        SCROLL=$((SCROLL + SCROLL_STEP))
       fi
 
-      SCROLL=$((SCROLL + $SCROLL_STEP))
+      if [[ $SCROLL -gt ${#NAME} ]]; then
+        echo "-1" > /tmp/conky-media-scroll-step
+      fi
+
+      if [[ $SCROLL -lt "1" ]]; then
+        echo "+1" > /tmp/conky-media-scroll-step
+      fi
+
       echo "$SCROLL" > $SCROLL_INDEX
     fi
 
-
     META=$(playerctl -p "$ACTIVE_PLAYER_NAME" metadata --format "$NAME --- {{ duration(position) }} / {{ duration(mpris:length) }}")
-
-    # ART_URL=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ mpris:artUrl }}")
-    # ART_URL_HASH=$(hash "$ART_URL")
-
-    # ART_FILE=/tmp/conky-media-art.png
-
-    # if [[ ! -f "$ART_FILE-$ART_URL_HASH" ]]; then
-    #   curl -X GET "$ART_URL" --output "$ART_FILE" -s
-    # fi
 
     echo "$META | $PERCENT%" && exit 0
   fi
