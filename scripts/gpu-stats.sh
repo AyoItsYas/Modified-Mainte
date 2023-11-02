@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 
 if [ -f /tmp/radeontop.pid ]; then
   PID=$(cat /tmp/radeontop.pid)
@@ -35,7 +35,7 @@ RADEONTOP_OUTPUT=$(echo $RADEONTOP_OUTPUT | tr "," "\n")
 if [ "$1" = "vram" ]; then
   VRAM_DATA=$(echo "$RADEONTOP_OUTPUT" | grep "vram")
 
-  VRAM_USED=$(echo "$VRAM_DATA" | cut -d " " -f 4)
+  VRAM_USED=$(echo "$VRAM_DATA" | cut -d " " -f 4 )
   VRAM_USAGE=$(echo "$VRAM_DATA" | cut -d " " -f 3)
 
   VRAM_CLOCK=$(echo "$RADEONTOP_OUTPUT" | grep "mclk" | cut -d " " -f 4)

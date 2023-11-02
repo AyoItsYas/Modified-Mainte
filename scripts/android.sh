@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 
 OUT=$(adb devices -l | grep "model")
 

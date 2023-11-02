@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 if [ -f /tmp/ifstat.pid ]; then
   PID=$(cat /tmp/ifstat.pid)

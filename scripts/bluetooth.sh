@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/usr/bin/sh
+
 # leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
 
 OUT=$(bluetoothctl devices | cut -f2 -d' ' | while read uuid; do bluetoothctl info $uuid; done | grep -e "Device\|Connected\|Name" | awk 'ORS=NR%3?",":RS' | tr -d ',' | grep "yes" | awk '{printf "%s %s\n", $2, $5}')

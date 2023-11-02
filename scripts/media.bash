@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 PLAYERS=$(playerctl -l)
 
@@ -25,8 +25,7 @@ for PLAYER in $PLAYERS; do
 done
 
 if [[ -z "$ACTIVE_PLAYER" ]]; then
-  ACTIVE_PLAYER=$(echo "$PLAYERS" | head -n 1)
-  ACTIVE_PLAYER_NAME=$ACTIVE_PLAYER
+  echo na && exit 0
 fi
 
 if [[ $1 == "player" ]]; then
