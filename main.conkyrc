@@ -74,10 +74,10 @@ ${alignr 97}└─────── cpu ────────
 ${voffset 0}
 ${alignr 75}$swap / $swapmax ${swapperc}% swap --- $mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
 ${voffset 31}
-${alignr 78}${execi 30 bash ./scripts/network.bash ip } - ${execi 30 bash ./scripts/network.bash } ─┬─── network ─────
+${alignr 78}${execi 30 bash ./scripts/network.bash ip } - ${execi 30 bash ./scripts/network.bash } : interface ─┬─── network ─────
 ${alignr 197}│
-${alignr 197}${execi 30 bash ./scripts/network.bash dns } :     dns ─┤
-${alignr 197}${execi 30 bash ./scripts/network.bash gtw } : gateway ─┘
+${alignr 197}${execi 30 bash ./scripts/network.bash dns } :       dns ─┤
+${alignr 197}${execi 30 bash ./scripts/network.bash gtw } :   gateway ─┘
 ${voffset -13}
 #${offset 325}${upspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3} ${downspeedgraph wlp2s0 50,130 BCC3C3 BCC3C3}
 #${offset 385}UP                ${offset -2} DOWN

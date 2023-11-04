@@ -1,6 +1,6 @@
 #!/usr/bin/sh
 
-#leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
+# leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
 
 OUT=$(lsusb)
 BUSN=$(echo "$OUT" | awk '{print $2}' | sort -u | wc -l)
