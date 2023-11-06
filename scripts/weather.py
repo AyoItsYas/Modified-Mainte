@@ -165,8 +165,8 @@ def print_data():
 
     print(
         f"   │"
-        f"\n   ├─── refreshed   : {LAST_UPDATE_FRIENDLY}"
-        f"\n   └─── last update : {TIME_NOW_FRIENDLY}"
+        f"\n   ├─── fetched     : {LAST_UPDATE_FRIENDLY}"
+        f"\n   └─── refreshed   : {TIME_NOW_FRIENDLY}"
     )
 
 

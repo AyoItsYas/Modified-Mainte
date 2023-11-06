@@ -151,15 +151,7 @@ PLACEHOLDERS.update(
     }
 )
 
-# section 1
-
-SEC1_PLACEHOLDERS = {
-    "h_entries_rx": convert_bytes(HOURLY_TOTAL_RX),
-    "h_entries_tx": convert_bytes(HOURLY_TOTAL_TX),
-    "h_entries_total": convert_bytes(HOURLY_TOTAL),
-}
-
-HOURLY_ENTRIES_TO_SHOW = 6
+HOURLY_ENTRIES_TO_SHOW = 5
 SEC2_START, SEC2_END = HOURLY_SCROLL_INDEX, HOURLY_SCROLL_INDEX + HOURLY_ENTRIES_TO_SHOW
 
 HOURLY_SCROLL_INDEX += HOURLY_SCROLL_STEP
@@ -170,16 +162,19 @@ with open(HOURLY_SCROLL_INDEX_FILE, "w") as f:
     f.write(str(HOURLY_SCROLL_INDEX))
 
 
-# section 2
+# section 1
 
-SEC2_PLACEHOLDERS = {
-    "h_entries_avg": convert_bytes(HOURLY_AVG),
+SEC1_PLACEHOLDERS = {
+    "h_entries_rx": convert_bytes(HOURLY_TOTAL_RX),
+    "h_entries_tx": convert_bytes(HOURLY_TOTAL_TX),
     "h_entries_max": convert_bytes(max([x["total"] for x in DATA_NO_NONE.values()])),
     "h_entries_min": convert_bytes(min([x["total"] for x in DATA_NO_NONE.values()])),
+    "h_entries_avg": convert_bytes(HOURLY_AVG),
+    "h_entries_total": convert_bytes(HOURLY_TOTAL),
     "n_h_entries_to_show": str(HOURLY_ENTRIES_TO_SHOW),
 }
 
-SEC2_ROWS = []
+SEC1_ROWS = []
 for i, (h, ENTRY) in enumerate(DATA.items()):
     if ENTRY is None:
         ENTRY = {"rx": 0, "tx": 0, "total": 0}
@@ -193,10 +188,12 @@ for i, (h, ENTRY) in enumerate(DATA.items()):
     flags = {
         "MOR": ENTRY["total"] > HOURLY_AVG and not flags["max"],  # more than avg
         "LES": ENTRY["total"] < HOURLY_AVG and not flags["min"],  # less than avg
+        "RX": ENTRY["rx"] > ENTRY["tx"],  # more rx than tx
+        "TX": ENTRY["tx"] > ENTRY["rx"],  # more tx than rx
         **flags,
     }
 
-    flags_str = " ".join([k for k, v in flags.items() if v])
+    flags_str = ",".join([k for k, v in flags.items() if v])
 
     row = (
         f"{h:02.0f}",
@@ -206,7 +203,7 @@ for i, (h, ENTRY) in enumerate(DATA.items()):
         flags_str,
     )
 
-    SEC2_ROWS.append(row)
+    SEC1_ROWS.append(row)
 
 
 SEC2_ALIGNERS: tuple[Callable[[str, int], str], ...] = (
@@ -214,52 +211,23 @@ SEC2_ALIGNERS: tuple[Callable[[str, int], str], ...] = (
     lambda x, y: x.rjust(y + 1),
     lambda x, y: x.rjust(y + 1),
     lambda x, y: x.rjust(y + 1),
-    lambda x, y: f"[{x.center(y + 2)}]" if x != "" else x,
+    lambda x, y: f"({x.center(y + 2)})" if x != "" else x,
 )
 
-if len(SEC2_ALIGNERS) != len(SEC2_ROWS[0]):
+if len(SEC2_ALIGNERS) != len(SEC1_ROWS[0]):
     print("SEC2_ALIGNERS and SEC2_ROWS have different lengths!")
     sys.exit(1)
 
 
-SEC2_COLS_ALIGNMENT_OFFSETS = [0] * len(SEC2_ROWS[0])
+SEC2_COLS_ALIGNMENT_OFFSETS = [0] * len(SEC1_ROWS[0])
 
-for ROW in SEC2_ROWS:
+for ROW in SEC1_ROWS:
     for i, COL in enumerate(ROW):
         SEC2_COLS_ALIGNMENT_OFFSETS[i] = (
             x
             if (x := len(COL)) > SEC2_COLS_ALIGNMENT_OFFSETS[i]
             else SEC2_COLS_ALIGNMENT_OFFSETS[i]
         )
-
-
-TMP_LINES = """
-┌─ < ── {heading} --- {label}
-│
-└──┬─── interface : {interface}
-   │
-   ├─┬─ tx        : {h_entries_tx:>{SEC1--max_len}} ({h_entries_total} / {n_h_entries})
-   │ ├─ rx        : {h_entries_rx:>{SEC1--max_len}}
-   │ └─ total     : {h_entries_total:>{SEC1--max_len}}
-   │
-   ├─┬─ 24 hours  : {n_h_entries} entries ({h_entry_freq}) ~ {n_h_entries_to_show} shown @ {scroll_index}
-   │ │
-   │ ├─ avg       : {h_entries_avg:>{SEC2--max_len}}
-   │ ├─ max       : {h_entries_max:>{SEC2--max_len}} ~ [{h_entries_max_range}]
-   │ ├─ min       : {h_entries_min:>{SEC2--max_len}} ~ [{h_entries_min_range}]
-   │ │
-"""
-LINES += TMP_LINES[1:]
-
-for i, ROW in enumerate(SEC2_ROWS[SEC2_START : SEC2_END + 1]):
-    pre = "├" if i != HOURLY_ENTRIES_TO_SHOW else "└"
-
-    ROW = [
-        a(x, y)
-        for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_ALIGNMENT_OFFSETS))
-    ]
-
-    LINES += "   │ {}─ i{:02.0f} h{} <R{} S{} T{}> {}\n".format(pre, i, *ROW)
 
 # monthly data
 
@@ -296,25 +264,16 @@ PLACEHOLDERS.update(
 
 # section 3
 
-SEC3_PLACEHOLDERS = {
-    "weekly_rx": convert_bytes(MONTHLY_TOTAL_RX),
-    "weekly_tx": convert_bytes(MONTHLY_TOTAL_TX),
-    "weekly_total": convert_bytes(MONTHLY_TOTAL),
+SEC2_PLACEHOLDERS = {
+    "m_entries_rx": convert_bytes(MONTHLY_TOTAL_RX),
+    "m_entries_tx": convert_bytes(MONTHLY_TOTAL_TX),
+    "m_entries_avg": convert_bytes(MONTHLY_TOTAL / len(DATA)),
+    "m_entries_total": convert_bytes(MONTHLY_TOTAL),
 }
 
+# section placeholders
 
-TMP_LINES = """
-   │
-   ├─┬─ 31 days   : {n_m_entries} entries (every 24 hours)
-   │ │
-   │ ├─ max       : {m_entries_max:>{SEC3--max_len}} ~ [{m_entries_max_range}]
-   │ └─ min       : {m_entries_min:>{SEC3--max_len}} ~ [{m_entries_min_range}]
-   │
-   └─── refreshed : {last_update}
-"""
-LINES += TMP_LINES[1:-1]
-
-SECTIONS = (SEC1_PLACEHOLDERS, SEC2_PLACEHOLDERS, SEC3_PLACEHOLDERS)
+SECTIONS = (SEC1_PLACEHOLDERS, SEC2_PLACEHOLDERS)
 
 for i, SEC in enumerate(SECTIONS, 1):
     # each sections values max len for alignment
@@ -324,7 +283,47 @@ for i, SEC in enumerate(SECTIONS, 1):
 
 # final print
 
+TMP_LINES = """
+┌─ < ── {heading} --- {label}
+│
+└──┬─── interface : {interface}
+   │
+   ├─┬─ 24 hours  : {n_h_entries} entries ({h_entry_freq}) ~ {n_h_entries_to_show} shown @ {scroll_index}
+   │ │
+   │ ├─ max       : {h_entries_max:>{SEC1--max_len}} ~ [{h_entries_max_range}]
+   │ ├─ min       : {h_entries_min:>{SEC1--max_len}} ~ [{h_entries_min_range}]
+   │ │
+   │ ├─ avg       : {h_entries_avg:>{SEC1--max_len}} = ({h_entries_total} / {n_h_entries})
+   │ ├─ total     : {h_entries_total:>{SEC1--max_len}} = (TX {h_entries_tx} + RX {h_entries_rx})
+   │ │
+"""
+LINES += TMP_LINES[1:]
+
+for i, ROW in enumerate(SEC1_ROWS[SEC2_START : SEC2_END + 1]):
+    pre = "├" if i != HOURLY_ENTRIES_TO_SHOW else "└"
+
+    ROW = [
+        a(x, y)
+        for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_ALIGNMENT_OFFSETS))
+    ]
+
+    LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{}> {}\n".format(pre, i, *ROW)
+
+TMP_LINES = """
+   │
+   ├─┬─ 31 days   : {n_m_entries} entries (every 24 hours)
+   │ │
+   │ ├─ max       : {m_entries_max:>{SEC2--max_len}} ~ [{m_entries_max_range}]
+   │ ├─ min       : {m_entries_min:>{SEC2--max_len}} ~ [{m_entries_min_range}]
+   │ │
+   │ ├─ avg       : {m_entries_avg:>{SEC2--max_len}} = ({m_entries_total} / {n_m_entries})
+   │ └─ total     : {m_entries_total:>{SEC2--max_len}} = (TX {m_entries_tx} + RX {m_entries_rx})
+   │
+   └─── refreshed : {last_update}
+"""
+LINES += TMP_LINES[1:-1]
+
 try:
     print(LINES.format(**PLACEHOLDERS))
 except KeyError as e:
-    print(f"missing {e} in the format variables")
+    print(f"Missing {e} in the format variables")
