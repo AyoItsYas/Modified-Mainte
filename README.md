@@ -12,3 +12,12 @@
 # Setting Up
 
 Clone the repo to a desired location and run conky on all the overlays. You can use conky manager or any tool to manage the theme, or [this](https://github.com/AyoItsYas/bin/blob/main/conkyd) simple script should suffice.
+
+```
+git clone https://github.com/AyoItsYas/Mainte.git
+mkdir -p ~/.config/.conky/
+mv ./Mainte/ ~/.config/.conky/
+
+curl https://raw.githubusercontent.com/AyoItsYas/bin/main/conkyd > conkyd
+./conkyd start
+```
