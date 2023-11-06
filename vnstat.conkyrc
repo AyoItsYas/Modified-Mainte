@@ -23,9 +23,9 @@ conky.config = {
     default_color = '#BEC8CB',
     default_shade_color = '#BEC8CB',
     default_outline_color = '#BEC8CB',
-    alignment = 'bottom_left',
+    alignment = 'top_left',
     gap_x = 60,
-    gap_y = 110,
+    gap_y = 60,
     no_buffers = true,
     cpu_avg_samples = 1,
     net_avg_samples = 1,
@@ -37,5 +37,5 @@ conky.config = {
 
 conky.text = [[
 #leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
-${texeci 01 python3 ./scripts/weather.py "Meegoda, Sri Lanka"}
+${exec python3 ./scripts/vnstat.py}
 ]];

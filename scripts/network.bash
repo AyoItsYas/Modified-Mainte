@@ -1,24 +1,24 @@
 #!/usr/bin/bash
 
-if [ -f /tmp/ifstat.pid ]; then
-  PID=$(cat /tmp/ifstat.pid)
+# if [ -f /tmp/ifstat.pid ]; then
+#   PID=$(cat /tmp/ifstat.pid)
 
-  if [ ! -d /proc/$PID ]; then
-    rm /tmp/ifstat.log
-    rm /tmp/ifstat.pid
-    exit 1
-  fi
-fi
+#   if [ ! -d /proc/$PID ]; then
+#     rm /tmp/ifstat.log
+#     rm /tmp/ifstat.pid
+#     exit 1
+#   fi
+# fi
 
-if [ ! -f /tmp/ifstat.log ]; then
-  ifstat > /tmp/ifstat.log &
+# if [ ! -f /tmp/ifstat.log ]; then
+#   ifstat > /tmp/ifstat.log &
 
-  echo $! > /tmp/ifstat.pid
+#   echo $! > /tmp/ifstat.pid
 
-  while [ ! -f /tmp/ifstat.log ]; do
-    sleep 0.1
-  done
-fi
+#   while [ ! -f /tmp/ifstat.log ]; do
+#     sleep 0.1
+#   done
+# fi
 
 IP_OUTPUT=$(ip route get "1.1.1.1" 2>&1)
 

@@ -33,15 +33,21 @@ done <<< "$OUT"
 
 i=1
 while [ $i -le $BUSN ]; do
-  echo "│" | awk '{ printf "%109s\n", $0 }'
+  if [ $i -eq 1 ]; then
+    :
+  else
+    echo "│" | awk '{ printf "%109s\n", $0 }'
+  fi
   DEVICESN=$(echo "$OUT" | grep "Bus 00$i" | wc -l)
 
   PRE="┤"
-  if [ $i -eq $BUSN ]; then
+  if [ $i -eq 1 ]; then
+    PRE="┬"
+  elif [ $i -eq $BUSN ]; then
     PRE="┘"
   fi
 
-  echo "┌── $i BUS ──$PRE" | awk '{ printf "%119s\n", $0 }'
+  echo "┌── BUS $i ──$PRE" | awk '{ printf "%119s\n", $0 }'
 
   BUS_DEVICES=$(echo "$OUT" | grep "Bus 00$i")
   DEVICESN=$(echo "$BUS_DEVICES" | wc -l)
@@ -73,7 +79,7 @@ while [ $i -le $BUSN ]; do
       USBGUARD_STATUS="blocked"
     fi
 
-    echo "<${array[5]} $DEVICE_NAME> $USBGUARD_STATUS $k ─$PRE           $CN_PRE" | awk '{ printf "%113s\n", $0 }'
+    echo "<${array[5]} $DEVICE_NAME $USBGUARD_STATUS> D$k ─$PRE           $CN_PRE" | awk '{ printf "%113s\n", $0 }'
     sleep 0.05
 
     if [ $j -eq $DEVICESN ]; then

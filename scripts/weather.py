@@ -9,13 +9,17 @@ import time
 
 API_KEY = os.getenv("OPENWEATHERMAP_API_KEY")
 
+if not API_KEY:
+    print("'OPENWEATHERMAP_API_KEY' environment variable not set")
+    exit(0)
+
 CACHE_DIR = os.getenv("XDG_CACHE_HOME", os.path.expanduser("~/.cache"))
 CACHE_FILE = os.path.join(CACHE_DIR, "weather.json")
-CACHE_TIME = 1200  # 1 request every 20 minute
+CACHE_TIME = 1200
 
 SCROLL_STEP = 1
 SCROLL_FIXED = 5
-SCROLL_CHUNK_SIZE = 15
+SCROLL_CHUNK_SIZE = 10
 SCROLL_INDEX_FILE = os.path.join(CACHE_DIR, "weather-scroll.index")
 
 LAST_UPDATE = 0
@@ -44,20 +48,29 @@ if os.path.exists(CACHE_FILE):
 def get_weather():
     url = f"https://api.openweathermap.org/data/2.5/weather?q={LOCATION}&appid={API_KEY}&units=metric"
 
-    return requests.get(url).json()
+    request = requests.get(url)
+    data = request.json()
+
+    if request.status_code != 200:
+        raise Exception(data)
+
+    return data
 
 
 def get_forecast():
     url = f"https://api.openweathermap.org/data/2.5/forecast?q={LOCATION}&appid={API_KEY}&units=metric"
 
-    return requests.get(url).json()
+    request = requests.get(url)
+    data = request.json()
+
+    if request.status_code != 200:
+        raise Exception(data)
+
+    return data
 
 
 if time.time() - LAST_UPDATE > CACHE_TIME:
-    try:
-        data = {"weather": get_weather(), "forecast": get_forecast()}
-    except Exception as e:
-        exit(0)
+    data = {"weather": get_weather(), "forecast": get_forecast()}
 
     with open(CACHE_FILE, "w") as f:
         json.dump(data, f)
@@ -65,12 +78,7 @@ else:
     with open(CACHE_FILE) as f:
         data = json.load(f)
 
-WEATHER_DATA = data["weather"]
-FORECAST_DATA = data["forecast"]
-
-
-def print_weather():
-    pass
+WEATHER_DATA, FORECAST_DATA = data["weather"], data["forecast"]
 
 
 def print_data():
@@ -126,34 +134,40 @@ def print_data():
         f"\n   ├─── sunset      : {time.strftime('%H:%M:%S', time.localtime(WEATHER_DATA['sys']['sunset' ]))}"
         f"\n   ├─── sunrise     : {time.strftime('%H:%M:%S', time.localtime(WEATHER_DATA['sys']['sunrise']))}"
         f"\n   │"
-        f"\n   ├─── refreshed   : {LAST_UPDATE_FRIENDLY}"
-        f"\n   ├─── last update : {TIME_NOW_FRIENDLY}"
-        f"\n   │"
-        f"\n   └─┬─ forecast    : {len(FORECAST_DATA['list'])} entries (every 3 hours) - {SCROLL_CHUNK_SIZE} shown @ {SCROLE_INDEX}"
-        f"\n     │"
+        f"\n   ├─┬─ forecast    : {len(FORECAST_DATA['list'])} entries (every 3 hours) ~ {SCROLL_CHUNK_SIZE} shown @ {SCROLE_INDEX}"
+        f"\n   │ │"
     )
 
     aligners = (
-        lambda x, _: x,
-        lambda x, y: x.ljust(y),
+        lambda x, _: x,  # blank aligner
+        lambda x, y: x.ljust(y),  # left alignment for second column
     )
 
     if len(aligners) < len(max_len_per_col):
         aligners += (lambda x, y: x.rjust(y),) * (len(max_len_per_col) - len(aligners))
 
-    max_len_per_col.pop(0)
+    max_len_per_col.pop(0)  # remove index column
 
     for i, line in enumerate(print_array):
-        w = line.pop(0)
-        pre = "     ├─" if i != SCROLL_CHUNK_SIZE - 1 else "     └─"
-        if i == SCROLL_FIXED:
-            print("     │")
-        print(
-            f"{pre} i{i:02.0f} w{w} <{' '.join([m(x,y) for  m, (x, y) in zip(aligners, zip(line, max_len_per_col))])}>{' &' if i < SCROLL_FIXED else ''}"
+        w = line.pop(0)  # remove index column
+        pinned = i < SCROLL_FIXED
+
+        pre = "   │ ├─" if i != SCROLL_CHUNK_SIZE - 1 else "   │ └─"
+
+        if i == SCROLL_FIXED:  # end of fixed section
+            print("   │ │")
+
+        info = " ".join(
+            [m(x, y) for m, (x, y) in zip(aligners, zip(line, max_len_per_col))]
         )
 
+        print(f"{pre} i{i:02.0f} w{w} <{info}>{' &' if pinned else ''}")
 
-# leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
+    print(
+        f"   │"
+        f"\n   ├─── refreshed   : {LAST_UPDATE_FRIENDLY}"
+        f"\n   └─── last update : {TIME_NOW_FRIENDLY}"
+    )
 
 
 print_data()
