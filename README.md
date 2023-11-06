@@ -1,34 +1,14 @@
-<p align="center">
-  <img src="https://i.ibb.co/RHcqFLx/Screenshot-20191202-223118.png">
-</p>
+![image](https://github.com/AyoItsYas/Mainte/assets/50617221/0765d23c-6d3e-4fab-936d-982f28d6c732)
 
-A simple and functional conky theme for all desktop environment. Based on "[conky-bandithijodotcom](https://mega.nz/#!y8JTFAYD!siXwByZVpZAQUfpocT46M1aMRUP9Qfs5mjCnumCA-ew)".
+# Mainte
 
-In this new version, all elements have been adjusted for Manjaro Linux KDE x64 with ASUS laptop. Match for 1366x768 screen resolution.
+- Designed screen resolution is 1920x1080
+- Each overlay has their own dependancies
+  - vnstat    : for network usage statistics
+  - python3   : where complex logic was needed for text formatting
+  - playerctl : for media status and metadata
+  - radeontop : for AMD GPU statistics
 
-# Usage
-For those who want to try this conky theme, here’s a step by step how to setup guide:
+# Setting Up
 
-1. First of all, open terminal and install conky if you don’t have it via command:
-```
-sudo pacman -S conky
-```
-2. Download Mainte theme from [Releases](https://github.com/gvoze32/Mainte/releases)
-
-3. Extract all folder and copy to `/home/$USER/.conky` (set hidden file to visible on your file manager cause the folder is hidden)
-
-4. Open terminal and type
-```
-cd /home/$USER/.conky/Mainte
-./conky-launch.sh
-```
-
-*To automatically run when startup, just add conky-launch.sh to autostart.*
-
-# Credits
-
-- bandithijo
-
-- gvoze32
-
-- [Vector](https://www.reddit.com/r/thinkpad/search/?q=exploded%20wallpaper&restrict_sr=1)
+Clone the repo to a desired location and run conky on all the overlays. You can use conky manager or any tool to manage the theme, or [this](https://github.com/AyoItsYas/bin/blob/main/conkyd) simple script should suffice.
