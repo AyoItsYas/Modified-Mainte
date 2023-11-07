@@ -40,8 +40,14 @@ except Exception:
     SCROLL_INDEX = 0
 
 SCROLL_STEP = 1
-SCROLL_SIZE = 10
-SCROLL_FIXED = 5
+SCROLL_SIZE = 12
+SCROLL_FIXED = 4
+
+if SCROLL_INDEX >= 40:
+    SCROLL_INDEX = 0
+
+with open(SCROLL_INDEX_FILE, "w") as f:
+    f.write(str(SCROLL_INDEX + SCROLL_STEP))
 
 # loading openweathermap data and caching it
 
@@ -176,10 +182,6 @@ for w, forecast in enumerate(items):
         if (x := len(COL)) > COL_MAX_LEN:
             COLS_MAX_LEN[i] = x
 
-SCROLL_INDEX += SCROLL_STEP
-
-if SCROLL_INDEX >= n_items:
-    SCROLL_INDEX = 0
 
 items = (
     ROWS[:SCROLL_FIXED] + ROWS[SCROLL_INDEX + SCROLL_FIXED : SCROLL_INDEX + SCROLL_SIZE]
@@ -210,9 +212,7 @@ LINES += TMP_LINES[1:-1]  # remove the first and last newline and add to output
 
 # rendering the output
 
-print(LINES.format(**PLACEHOLDERS))
-
-# saving the scroll index
-
-with open(SCROLL_INDEX_FILE, "w") as f:
-    f.write(str(SCROLL_INDEX))
+try:
+    print(LINES.format(**PLACEHOLDERS))
+except KeyError as e:
+    utility.error(f"Missing {e} in the format variables")

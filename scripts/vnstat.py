@@ -8,6 +8,8 @@ import os
 import subprocess
 import sys
 
+from core import utility
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -25,8 +27,7 @@ def get_active_interface() -> str:
     # fmt: on
 
     if prc.returncode != 0:
-        print("Error: Unable to get active interface!")
-        sys.exit(1)
+        utility.error("Error: Unable to get active interface!")
 
     return prc.stdout.split(" ")[4]
 
@@ -44,8 +45,7 @@ def get_data(interface: str) -> dict:
 
         return data
     except json.decoder.JSONDecodeError:
-        print("Error: Unable to parse vnstat output!")
-        sys.exit(1)
+        utility.error("Error: Unable to parse vnstat output!")
 
 
 def convert_bytes(bytes: int, format_spec: str = ".2f") -> str:
@@ -105,10 +105,10 @@ HOURLY_TOTAL_RX = sum([x["rx"] for x in DATA_NO_NONE.values()])
 HOURLY_TOTAL_TX = sum([x["tx"] for x in DATA_NO_NONE.values()])
 
 HOURLY_TOTAL = HOURLY_TOTAL_RX + HOURLY_TOTAL_TX
-HOURLY_AVG = HOURLY_TOTAL / len(DATA_NO_NONE)
+HOURLY_AVG = HOURLY_TOTAL / x if (x := len(DATA_NO_NONE)) > 0 else 0
 
-DATA_MAX_ENTRY = max(DATA_NO_NONE, key=lambda x: DATA[x]["total"])
-DATA_MIN_ENTRY = min(DATA_NO_NONE, key=lambda x: DATA[x]["total"])
+DATA_MAX_ENTRY = max(DATA_NO_NONE, key=lambda x: DATA[x]["total"]) if x > 0 else 0
+DATA_MIN_ENTRY = min(DATA_NO_NONE, key=lambda x: DATA[x]["total"]) if x > 0 else 0
 
 
 # scroll index for hourly data
@@ -151,11 +151,10 @@ PLACEHOLDERS.update(
     }
 )
 
-HOURLY_ENTRIES_TO_SHOW = 5
-SEC2_START, SEC2_END = HOURLY_SCROLL_INDEX, HOURLY_SCROLL_INDEX + HOURLY_ENTRIES_TO_SHOW
-
+HOURLY_SCROLL_SIZE = 5
+SEC2_START, SEC2_END = HOURLY_SCROLL_INDEX, HOURLY_SCROLL_INDEX + HOURLY_SCROLL_SIZE
 HOURLY_SCROLL_INDEX += HOURLY_SCROLL_STEP
-if HOURLY_SCROLL_INDEX >= 24 - HOURLY_ENTRIES_TO_SHOW:
+if HOURLY_SCROLL_INDEX >= 24 - HOURLY_SCROLL_SIZE:
     HOURLY_SCROLL_INDEX = 0
 
 with open(HOURLY_SCROLL_INDEX_FILE, "w") as f:
@@ -167,11 +166,15 @@ with open(HOURLY_SCROLL_INDEX_FILE, "w") as f:
 SEC1_PLACEHOLDERS = {
     "h_entries_rx": convert_bytes(HOURLY_TOTAL_RX),
     "h_entries_tx": convert_bytes(HOURLY_TOTAL_TX),
-    "h_entries_max": convert_bytes(max([x["total"] for x in DATA_NO_NONE.values()])),
-    "h_entries_min": convert_bytes(min([x["total"] for x in DATA_NO_NONE.values()])),
+    "h_entries_max": convert_bytes(max([x["total"] for x in DATA_NO_NONE.values()]))
+    if len(DATA_NO_NONE) > 0
+    else "0",
+    "h_entries_min": convert_bytes(min([x["total"] for x in DATA_NO_NONE.values()]))
+    if len(DATA_NO_NONE) > 0
+    else "0",
     "h_entries_avg": convert_bytes(HOURLY_AVG),
     "h_entries_total": convert_bytes(HOURLY_TOTAL),
-    "n_h_entries_to_show": str(HOURLY_ENTRIES_TO_SHOW),
+    "n_h_entries_to_show": str(HOURLY_SCROLL_SIZE),
 }
 
 SEC1_ROWS = []
@@ -214,20 +217,14 @@ SEC2_ALIGNERS: tuple[Callable[[str, int], str], ...] = (
     lambda x, y: f"({x.center(y + 2)})" if x != "" else x,
 )
 
-if len(SEC2_ALIGNERS) != len(SEC1_ROWS[0]):
-    print("SEC2_ALIGNERS and SEC2_ROWS have different lengths!")
-    sys.exit(1)
 
-
-SEC2_COLS_ALIGNMENT_OFFSETS = [0] * len(SEC1_ROWS[0])
+SEC2_COLS_MAX_LEN = [0] * len(SEC1_ROWS[0])
 
 for ROW in SEC1_ROWS:
     for i, COL in enumerate(ROW):
-        SEC2_COLS_ALIGNMENT_OFFSETS[i] = (
-            x
-            if (x := len(COL)) > SEC2_COLS_ALIGNMENT_OFFSETS[i]
-            else SEC2_COLS_ALIGNMENT_OFFSETS[i]
-        )
+        if (x := len(COL)) > SEC2_COLS_MAX_LEN[i]:
+            SEC2_COLS_MAX_LEN[i] = x
+
 
 # monthly data
 
@@ -300,12 +297,9 @@ TMP_LINES = """
 LINES += TMP_LINES[1:]
 
 for i, ROW in enumerate(SEC1_ROWS[SEC2_START : SEC2_END + 1]):
-    pre = "├" if i != HOURLY_ENTRIES_TO_SHOW else "└"
+    pre = "├" if i != HOURLY_SCROLL_SIZE else "└"
 
-    ROW = [
-        a(x, y)
-        for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_ALIGNMENT_OFFSETS))
-    ]
+    ROW = [a(x, y) for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_MAX_LEN))]
 
     LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{}> {}\n".format(pre, i, *ROW)
 
@@ -322,6 +316,8 @@ TMP_LINES = """
    └─── refreshed : {last_update}
 """
 LINES += TMP_LINES[1:-1]
+
+# rendering the output
 
 try:
     print(LINES.format(**PLACEHOLDERS))
