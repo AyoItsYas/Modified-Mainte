@@ -19,5 +19,6 @@ mkdir -p ~/.config/.conky/
 mv ./Mainte/ ~/.config/.conky/
 
 curl https://raw.githubusercontent.com/AyoItsYas/bin/main/conkyd > conkyd
+chmod +x conkyd
 ./conkyd start
 ```
