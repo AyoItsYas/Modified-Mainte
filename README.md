@@ -15,9 +15,10 @@ Clone the repo to a desired location and run conky on all the overlays. You can 
 
 ```
 git clone https://github.com/AyoItsYas/Mainte.git
-mkdir -p ~/.config/.conky/
-mv ./Mainte/ ~/.config/.conky/
+mkdir -p ~/.conky/
+mv ./Mainte/ ~/.conky/
 
 curl https://raw.githubusercontent.com/AyoItsYas/bin/main/conkyd > conkyd
+chmod +x conkyd
 ./conkyd start
 ```
