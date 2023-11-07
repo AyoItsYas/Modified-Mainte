@@ -8,7 +8,6 @@ DEVICESN=$(echo "$OUT" | wc -l)
 
 USBGUARD_OUTPUT=$(usbguard list-devices)
 
-# fill should be the number of characters the device number takes for example if DEVICESN=10 then FILL=2 if DEVICESN=100 then FILL=3
 if [ $DEVICESN -lt 10 ]; then
   FILL=1
 elif [ $DEVICESN -lt 100 ]; then

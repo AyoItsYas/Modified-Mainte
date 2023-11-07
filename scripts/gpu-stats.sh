@@ -60,7 +60,7 @@ fi
 
 if [ "$1" = "temp" ]; then
   SENSOR_DATA=$(sensors)
-  # find the line that says "radeon" then get the line 2 lines below it
+
   LINE=$(echo "$SENSOR_DATA" | grep -n "radeon" | cut -d ":" -f 1)
   LINE=$((LINE + 2))
   LINE=$(echo "$SENSOR_DATA" | sed "${LINE}q;d")

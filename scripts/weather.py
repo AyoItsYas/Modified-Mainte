@@ -92,7 +92,6 @@ def print_data():
             f"{forecast['main']['temp']:02.2f}°C",
             forecast["weather"][0]["main"],
             forecast["weather"][0]["description"],
-            # time.strftime("%H:%M", time.localtime(forecast["dt"])),
             forecast["dt_txt"],
         )
         line = [str(x) if type(x) is not str else x for x in line]

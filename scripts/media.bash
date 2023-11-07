@@ -48,12 +48,14 @@ else
   if [[ $1 == "perc" ]]; then
     echo "$PERCENT" && exit 0
   else
-    if [[ $ACTIVE_PLAYER == "vlc" ]]; then
-      NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ xesam:url }}")
-    elif [[ $ACTIVE_PLAYER =~ ^(brave|chromium) ]]; then
+    if [[ $ACTIVE_PLAYER =~ ^(brave|chromium|vlc) ]]; then
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }}")
     else
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }} - {{ artist }}")
+    fi
+
+    if [[ -z "$NAME" ]]; then
+      NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ xesam:url }}")
     fi
 
 
