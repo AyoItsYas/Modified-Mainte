@@ -313,14 +313,18 @@ TMP_LINES = """
 """
 LINES += TMP_LINES[1:]
 
-X = [SEC1_ROWS[DATA_MAX_ENTRY], SEC1_ROWS[DATA_MIN_ENTRY]]
-X += SEC1_ROWS[SEC1_START + 1 : SEC1_END]
+PINNED = [
+    SEC1_ROWS[DATA_MAX_ENTRY],
+    SEC1_ROWS[NOW.hour],
+    SEC1_ROWS[DATA_MIN_ENTRY],
+]  # pinning the max, current and min data transfer hours
+PINNED_N = len(PINNED)
 
-for i, ROW in enumerate(X):
+for i, ROW in enumerate(PINNED + SEC1_ROWS[SEC1_START + (PINNED_N - 1) : SEC1_END]):
     pre = "├" if i != HOURLY_SCROLL_SIZE else "└"
-    is_pinned = i < 2
+    is_pinned = i < PINNED_N
 
-    if i == 2:
+    if i == PINNED_N:
         LINES += "   │ │" + "\n"
         pass
 
