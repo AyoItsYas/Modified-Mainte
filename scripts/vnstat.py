@@ -6,7 +6,6 @@ import datetime
 import json
 import os
 import subprocess
-import sys
 
 from core import utility
 
@@ -45,24 +44,8 @@ def get_data(interface: str) -> dict:
 
         return data
     except json.decoder.JSONDecodeError:
+        print(prc.stdout)
         utility.error("Error: Unable to parse vnstat output!")
-
-
-def convert_bytes(bytes: int, format_spec: str = ".2f") -> str:
-    if bytes < 1024:
-        return f"{bytes:{format_spec}}B"
-    elif bytes < 1024**2:
-        return f"{bytes / 1024:{format_spec}}KB"
-    elif bytes < 1024**3:
-        return f"{bytes / 1024 ** 2:{format_spec}}MB"
-    elif bytes < 1024**4:
-        return f"{bytes / 1024 ** 3:{format_spec}}GB"
-    elif bytes < 1024**5:
-        return f"{bytes / 1024 ** 4:{format_spec}}TB"
-    elif bytes < 1024**6:
-        return f"{bytes / 1024 ** 5:{format_spec}}PB"
-    else:
-        return f"{bytes / 1024 ** 6:{format_spec}}EB"
 
 
 NOW = datetime.datetime.now()
@@ -136,7 +119,7 @@ HOUR_RANGE_SKEL = "{:02.0f}:00 - {:02.0f}:00"
 
 PLACEHOLDERS.update(
     {
-        "label": f"DAILY TOTAL: {convert_bytes(HOURLY_TOTAL)}",
+        "label": f"DAILY TOTAL: {utility.convert_bytes(HOURLY_TOTAL)}",
         "heading": "vnstat",
         "interface": ACTIVE_INTF,
         "n_h_entries": len(DATA_NO_NONE),
@@ -151,8 +134,8 @@ PLACEHOLDERS.update(
     }
 )
 
-HOURLY_SCROLL_SIZE = 5
-SEC2_START, SEC2_END = HOURLY_SCROLL_INDEX, HOURLY_SCROLL_INDEX + HOURLY_SCROLL_SIZE
+HOURLY_SCROLL_SIZE = 10
+SEC1_START, SEC1_END = HOURLY_SCROLL_INDEX, HOURLY_SCROLL_INDEX + HOURLY_SCROLL_SIZE
 HOURLY_SCROLL_INDEX += HOURLY_SCROLL_STEP
 if HOURLY_SCROLL_INDEX >= 24 - HOURLY_SCROLL_SIZE:
     HOURLY_SCROLL_INDEX = 0
@@ -164,35 +147,57 @@ with open(HOURLY_SCROLL_INDEX_FILE, "w") as f:
 # section 1
 
 SEC1_PLACEHOLDERS = {
-    "h_entries_rx": convert_bytes(HOURLY_TOTAL_RX),
-    "h_entries_tx": convert_bytes(HOURLY_TOTAL_TX),
-    "h_entries_max": convert_bytes(max([x["total"] for x in DATA_NO_NONE.values()]))
+    "h_entries_rx": utility.convert_bytes(HOURLY_TOTAL_RX),
+    "h_entries_tx": utility.convert_bytes(HOURLY_TOTAL_TX),
+    "h_entries_max": utility.convert_bytes(
+        max([x["total"] for x in DATA_NO_NONE.values()])
+    )
     if len(DATA_NO_NONE) > 0
     else "0",
-    "h_entries_min": convert_bytes(min([x["total"] for x in DATA_NO_NONE.values()]))
+    "h_entries_min": utility.convert_bytes(
+        min([x["total"] for x in DATA_NO_NONE.values()])
+    )
     if len(DATA_NO_NONE) > 0
     else "0",
-    "h_entries_avg": convert_bytes(HOURLY_AVG),
-    "h_entries_total": convert_bytes(HOURLY_TOTAL),
+    "h_entries_avg": utility.convert_bytes(HOURLY_AVG),
+    "h_entries_total": utility.convert_bytes(HOURLY_TOTAL),
     "n_h_entries_to_show": str(HOURLY_SCROLL_SIZE),
 }
 
+GROWTH_DATA = {
+    h: color
+    for h, color in zip(
+        map(
+            lambda x: x[0],
+            sorted(DATA_NO_NONE.items(), key=lambda x: x[1]["total"]),
+        ),
+        utility.color_gradient_generator(
+            len(DATA_NO_NONE),
+            ["#DDDDDD", "#FFE900", "#FF7700", "#FF0000"],
+        ),
+    )
+}
+
+
 SEC1_ROWS = []
 for i, (h, ENTRY) in enumerate(DATA.items()):
+    color = ""
     if ENTRY is None:
         ENTRY = {"rx": 0, "tx": 0, "total": 0}
+        color = ""
+    elif ENTRY is not None and i in GROWTH_DATA:
+        color = GROWTH_DATA[i]
 
     flags = {
         "max": h == DATA_MAX_ENTRY,  # the max data transfer hour
         "min": h == DATA_MIN_ENTRY,  # the min data transfer hour
-        "now": h == NOW.hour,  # the current hour
     }
 
     flags = {
-        "MOR": ENTRY["total"] > HOURLY_AVG and not flags["max"],  # more than avg
-        "LES": ENTRY["total"] < HOURLY_AVG and not flags["min"],  # less than avg
         "RX": ENTRY["rx"] > ENTRY["tx"],  # more rx than tx
         "TX": ENTRY["tx"] > ENTRY["rx"],  # more tx than rx
+        "MOR": ENTRY["total"] > HOURLY_AVG and not flags["max"],  # more than avg
+        "LES": ENTRY["total"] < HOURLY_AVG and not flags["min"],  # less than avg
         **flags,
     }
 
@@ -200,10 +205,11 @@ for i, (h, ENTRY) in enumerate(DATA.items()):
 
     row = (
         f"{h:02.0f}",
-        convert_bytes(ENTRY["rx"], "02.2f"),
-        convert_bytes(ENTRY["tx"], "02.2f"),
-        convert_bytes(ENTRY["total"], "02.2f"),
+        utility.convert_bytes(ENTRY["rx"], "02.2f"),
+        utility.convert_bytes(ENTRY["tx"], "02.2f"),
+        utility.convert_bytes(ENTRY["total"], "02.2f"),
         flags_str,
+        color,
     )
 
     SEC1_ROWS.append(row)
@@ -247,8 +253,6 @@ DATE_RANGE_SKEL = "{year:0004.0f}-{month:02.0f}-{day:02.0f} - {year:0004.0f}-{mo
 PLACEHOLDERS.update(
     {
         "n_m_entries": len(DATA),
-        "m_entries_max": convert_bytes(MONTHLY_MAX_ENTRY["total"]),
-        "m_entries_min": convert_bytes(MONTHLY_MIN_ENTRY["total"]),
         "m_entries_max_range": DATE_RANGE_SKEL.format(
             **MONTHLY_MAX_ENTRY["date"], day_y=MONTHLY_MAX_ENTRY["date"]["day"] + 1
         ),
@@ -262,10 +266,12 @@ PLACEHOLDERS.update(
 # section 3
 
 SEC2_PLACEHOLDERS = {
-    "m_entries_rx": convert_bytes(MONTHLY_TOTAL_RX),
-    "m_entries_tx": convert_bytes(MONTHLY_TOTAL_TX),
-    "m_entries_avg": convert_bytes(MONTHLY_TOTAL / len(DATA)),
-    "m_entries_total": convert_bytes(MONTHLY_TOTAL),
+    "m_entries_rx": utility.convert_bytes(MONTHLY_TOTAL_RX),
+    "m_entries_tx": utility.convert_bytes(MONTHLY_TOTAL_TX),
+    "m_entries_max": utility.convert_bytes(MONTHLY_MAX_ENTRY["total"]),
+    "m_entries_min": utility.convert_bytes(MONTHLY_MIN_ENTRY["total"]),
+    "m_entries_avg": utility.convert_bytes(MONTHLY_TOTAL / len(DATA)),
+    "m_entries_total": utility.convert_bytes(MONTHLY_TOTAL),
 }
 
 # section placeholders
@@ -273,8 +279,7 @@ SEC2_PLACEHOLDERS = {
 SECTIONS = (SEC1_PLACEHOLDERS, SEC2_PLACEHOLDERS)
 
 for i, SEC in enumerate(SECTIONS, 1):
-    # each sections values max len for alignment
-    SEC[f"SEC{i}--max_len"] = max([len(x) for x in SEC.values()])
+    SEC[f"SEC{i}--max_len"] = max([len(x) for x in SEC.values() if type(x) is str])
 
     PLACEHOLDERS.update(SEC)
 
@@ -289,19 +294,48 @@ TMP_LINES = """
    │ │
    │ ├─ max       : {h_entries_max:>{SEC1--max_len}} ~ [{h_entries_max_range}]
    │ ├─ min       : {h_entries_min:>{SEC1--max_len}} ~ [{h_entries_min_range}]
-   │ │
    │ ├─ avg       : {h_entries_avg:>{SEC1--max_len}} = ({h_entries_total} / {n_h_entries})
    │ ├─ total     : {h_entries_total:>{SEC1--max_len}} = (TX {h_entries_tx} + RX {h_entries_rx})
    │ │
 """
 LINES += TMP_LINES[1:]
 
-for i, ROW in enumerate(SEC1_ROWS[SEC2_START : SEC2_END + 1]):
-    pre = "├" if i != HOURLY_SCROLL_SIZE else "└"
+TMP_LINE = " ".join(
+    r"${{color " + color + r"}}" + f"H{h:02.0f}" + r"${{color}}"
+    for h, color in GROWTH_DATA.items()
+)
+TMP_LINE = "   │ ├─ growth    : " + TMP_LINE + "\n"
 
+LINES += TMP_LINE
+
+TMP_LINES = """
+   │ │
+"""
+LINES += TMP_LINES[1:]
+
+X = [SEC1_ROWS[DATA_MAX_ENTRY], SEC1_ROWS[DATA_MIN_ENTRY]]
+X += SEC1_ROWS[SEC1_START + 1 : SEC1_END]
+
+for i, ROW in enumerate(X):
+    pre = "├" if i != HOURLY_SCROLL_SIZE else "└"
+    is_pinned = i < 2
+
+    if i == 2:
+        LINES += "   │ │" + "\n"
+        pass
+
+    color = ROW[-1]
     ROW = [a(x, y) for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_MAX_LEN))]
 
-    LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{}> {}\n".format(pre, i, *ROW)
+    color = r"${{color " + color + r"}}"
+    LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{color}{}{color_reset}> {} {pin_flag}\n".format(
+        pre,
+        i,
+        *ROW,
+        color=color,
+        color_reset=r"${{color}}",
+        pin_flag="&" if is_pinned else "",
+    )
 
 TMP_LINES = """
    │
@@ -309,7 +343,6 @@ TMP_LINES = """
    │ │
    │ ├─ max       : {m_entries_max:>{SEC2--max_len}} ~ [{m_entries_max_range}]
    │ ├─ min       : {m_entries_min:>{SEC2--max_len}} ~ [{m_entries_min_range}]
-   │ │
    │ ├─ avg       : {m_entries_avg:>{SEC2--max_len}} = ({m_entries_total} / {n_m_entries})
    │ └─ total     : {m_entries_total:>{SEC2--max_len}} = (TX {m_entries_tx} + RX {m_entries_rx})
    │

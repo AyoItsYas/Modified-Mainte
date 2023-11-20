@@ -73,12 +73,14 @@ while [ $i -le $BUSN ]; do
     USBGUARD_STATUS=$(echo "$USBGUARD_OUTPUT" | grep "${array[5]}" | awk '{print $2}')
 
     if [ "$USBGUARD_STATUS" = "allow" ]; then
+      COLOR="\${color        }"
       USBGUARD_STATUS="allowed"
     else
+      COLOR="\${color #FFE900}"
       USBGUARD_STATUS="blocked"
     fi
 
-    echo "<${array[5]} $DEVICE_NAME $USBGUARD_STATUS> D$k ─$PRE           $CN_PRE" | awk '{ printf "%113s\n", $0 }'
+    echo "<${array[5]} $DEVICE_NAME $COLOR$USBGUARD_STATUS\${color}> D$k ─$PRE           $CN_PRE" | awk '{ printf "%137s\n", $0 }'
     sleep 0.05
 
     if [ $j -eq $DEVICESN ]; then

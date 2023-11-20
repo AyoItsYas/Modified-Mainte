@@ -100,6 +100,8 @@ PLACEHOLDERS = {
     "n_forecast": len(OPENWEATHERMAP_DATA["forecast"]["list"]),
     "scroll_index": SCROLL_INDEX,
     "scroll_size": SCROLL_SIZE,
+    "CR": "${color #FF0000}",
+    "R": "${color}",
 }
 
 SEC1 = {
@@ -141,21 +143,14 @@ LINES = ""
 TMP_LINES = """
 ┌─ < ── api.openweathermap.org --- {main} ~ {description}
 │
-└──┬─── location    : {name} {country} ({lat:.2f}, {lon:.2f})
+└──┬─── location   : {name} {country} ({lat:.2f}, {lon:.2f})
    │
-   ├─┬─ temp        : {temp:02.1f}°C
-   │ │
-   │ ├─ max         : {temp_max:02.1f}°C
-   │ ├─ min         : {temp_min:02.1f}°C
-   │ └─ feels       : {feels_like:02.1f}°C
+   ├─── temp       : {temp:02.1f}°C (max: {temp_max:02.1f}°C, min {temp_min:02.1f}°C, feels like {feels_like:02.1f}°C)
+   ├─── humidity   : {humidity}%
+   ├─── wind speed : {wind_speed}m/s {wind_direction}°
+   ├─── daylight   : {sunrise} - {sunset}
    │
-   ├─── humidity    : {humidity:>{sec_2_max_len}}%
-   ├─── wind speed  : {wind_speed:>{sec_2_max_len}}m/s {wind_direction}°
-   │
-   ├─── sunset      : {sunset}
-   ├─── sunrise     : {sunrise}
-   │
-   ├─┬─ forecast    : {n_forecast} entries (every 3 hours) ~ {scroll_size} shown @ {scroll_index}
+   ├─┬─ forecast   : {n_forecast} entries (every 3 hours) ~ {scroll_size} shown @ {scroll_index}
    │ │
 """
 LINES += TMP_LINES[1:]  # remove the first newline and add to output
@@ -167,6 +162,15 @@ n_items = len(items)
 
 N_COLS = 5
 ROWS, COLS_MAX_LEN = [], [0] * N_COLS
+
+TEMP_GRADIENT = sorted(
+    map(lambda x: (x[0], x[1]["main"]["temp"]), enumerate(items)), key=lambda x: x[1]
+)
+TEMP_GRADIENT = utility.color_gradient_generator(
+    100,
+    ["#DDDDDD", "#FFE900", "#FF7700"],
+)
+
 
 for w, forecast in enumerate(items):
     ROW = [
@@ -198,15 +202,15 @@ for i, ROW in enumerate(items):
         TMP_LINES += "   │ │\n"
 
     connector = "├" if not is_last else "└"
-
-    TMP_LINES += f"   │ {connector}─ i{i:02.0f} {ROW[0]:>{COLS_MAX_LEN[0]}} <{ROW[1]:<{COLS_MAX_LEN[1]}} {ROW[2]:<{COLS_MAX_LEN[2]}} {ROW[3]:>{COLS_MAX_LEN[3]}} @ {ROW[4]}>{' &' if is_fixed else ''}\n"
+    color = TEMP_GRADIENT[round(float(ROW[1][:-2]))]
+    TMP_LINES += f"   │ {connector}─ i{i:02.0f} {ROW[0]:>{COLS_MAX_LEN[0]}} <${r'{{color '+color+r'}}'}{ROW[1]:<{COLS_MAX_LEN[1]}}${r'{{color}}'} {ROW[2]:<{COLS_MAX_LEN[2]}} {ROW[3]:>{COLS_MAX_LEN[3]}} @ {ROW[4]}>{' &' if is_fixed else ''}\n"
 
 
 LINES += TMP_LINES  # add the lines to output
 
 TMP_LINES = """
    │
-   └─── refreshed   : {time_now} ~ fetched @ {last_update}
+   └─── refreshed  : {time_now} ~ fetched @ {last_update}
 """
 LINES += TMP_LINES[1:-1]  # remove the first and last newline and add to output
 
