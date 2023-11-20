@@ -19,9 +19,9 @@ conky.config = {
     draw_graph_borders = true,
     stippled_borders = 0,
     border_width = 0,
-    default_color = '#BEC8CB',
-    default_shade_color = '#BEC8CB',
-    default_outline_color = '#BEC8CB',
+    default_color = 'BEC8CB',
+    default_shade_color = 'BEC8CB',
+    default_outline_color = 'BEC8CB',
     alignment = 'top_left',
     gap_x = 680,
     gap_y = 45,
@@ -58,7 +58,7 @@ ${alignr 113}${execi 5 bash ./scripts/gpu-stats.sh temp } --- ${execi 5 bash ./s
 ${alignr 36}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ────────────┐
 ${voffset 5}
 ${alignr 125}┌─────────────────────────────────┐
-${alignr 125}│  ${execi 3600 cat /proc/cpuinfo|grep 'model name'|sed -e 's/model name.*: //'|uniq|cut -c 1-36|sed 's/(R)//g'|sed 's/(TM)//g'|sed 's/CPU     //g'}  │
+${alignr 125}│  ${execi 3600 cat /proc/cpuinfo | grep 'model name'| sed -e 's/model name.*: //'| uniq | cut -c 1-36 | sed 's/(R)//g'|sed 's/(TM)//g' | sed 's/CPU     //g'}  │
 ${alignr 125}├- -  --  --  --  --  --  --  -- -┤
 ${alignr 125}│    core0 <${exec sensors | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
 ${alignr 125}├─────────────────────────────────┤

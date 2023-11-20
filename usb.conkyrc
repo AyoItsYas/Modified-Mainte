@@ -3,7 +3,7 @@ conky.config = {
     font = 'FuraCode Nerd Font:pixelsize=11',
     use_xft = true,
     xftalpha = 1.0,
-    update_interval = 1,
+    update_interval = 15,
     total_run_times = 0,
     own_window = true,
     own_window_transparent = true,
@@ -50,5 +50,5 @@ ${offset 1200}│
 ${offset 1200}│
 ${offset 738}${offset -3}  ── USB ${offset 3}─────────────────────────────────────────────────────────┘
 ${voffset -28}
-${texeci 60 bash ./scripts/usb.sh }
+${execp bash ./scripts/usb.sh }
 ]];

@@ -37,5 +37,5 @@ conky.config = {
 
 conky.text = [[
 #leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
-${exec python3 ./scripts/vnstat.py}
+${execp python3 ./scripts/vnstat.py}
 ]];
