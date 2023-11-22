@@ -83,6 +83,7 @@ DATA: dict[int, Union[dict, None]] = {
     for i in range(24)
 }
 DATA_NO_NONE: dict[int, dict] = {k: v for k, v in DATA.items() if v is not None}
+DATA_NO_NONE_N = len(DATA_NO_NONE)
 
 HOURLY_TOTAL_RX = sum([x["rx"] for x in DATA_NO_NONE.values()])
 HOURLY_TOTAL_TX = sum([x["tx"] for x in DATA_NO_NONE.values()])
@@ -164,6 +165,10 @@ SEC1_PLACEHOLDERS = {
     "n_h_entries_to_show": str(HOURLY_SCROLL_SIZE),
 }
 
+COLORS = utility.color_gradient_generator(
+    len(DATA_NO_NONE),
+    ["#dddddd", "#eee36f", "#ffe900", "#ffb000", "#ff7700", "#ff3c00"],
+)
 GROWTH_DATA = {
     h: color
     for h, color in zip(
@@ -171,10 +176,7 @@ GROWTH_DATA = {
             lambda x: x[0],
             sorted(DATA_NO_NONE.items(), key=lambda x: x[1]["total"]),
         ),
-        utility.color_gradient_generator(
-            len(DATA_NO_NONE),
-            ["#DDDDDD", "#FFE900", "#FF7700", "#FF0000"],
-        ),
+        COLORS,
     )
 }
 
@@ -285,7 +287,7 @@ for i, SEC in enumerate(SECTIONS, 1):
 
 # final print
 
-TMP_LINES = """
+LINES += """
 ┌─ < ── {heading} --- {label}
 │
 └──┬─── interface : {interface}
@@ -298,20 +300,20 @@ TMP_LINES = """
    │ ├─ total     : {h_entries_total:>{SEC1--max_len}} = (TX {h_entries_tx} + RX {h_entries_rx})
    │ │
 """
-LINES += TMP_LINES[1:]
+
+# printing the hourly data growth
 
 TMP_LINE = " ".join(
     r"${{color " + color + r"}}" + f"H{h:02.0f}" + r"${{color}}"
     for h, color in GROWTH_DATA.items()
 )
-TMP_LINE = "   │ ├─ growth    : " + TMP_LINE + "\n"
+LINES += "   │ ├─ growth    : " + TMP_LINE
 
-LINES += TMP_LINE
-
-TMP_LINES = """
+LINES += """
    │ │
 """
-LINES += TMP_LINES[1:]
+
+# printing the hourly data table
 
 PINNED = [
     SEC1_ROWS[DATA_MAX_ENTRY],
@@ -320,7 +322,12 @@ PINNED = [
 ]  # pinning the max, current and min data transfer hours
 PINNED_N = len(PINNED)
 
-for i, ROW in enumerate(PINNED + SEC1_ROWS[SEC1_START + (PINNED_N - 1) : SEC1_END]):
+LINE_DATA = PINNED + SEC1_ROWS[SEC1_START + (PINNED_N - 1) : SEC1_END]
+LINE_DATA_N = len(LINE_DATA)
+
+for i, ROW in enumerate(LINE_DATA):
+    lf_first, lf_last = i == 0, i == LINE_DATA_N - 1
+
     pre = "├" if i != HOURLY_SCROLL_SIZE else "└"
     is_pinned = i < PINNED_N
 
@@ -331,17 +338,17 @@ for i, ROW in enumerate(PINNED + SEC1_ROWS[SEC1_START + (PINNED_N - 1) : SEC1_EN
     color = ROW[-1]
     ROW = [a(x, y) for a, (x, y) in zip(SEC2_ALIGNERS, zip(ROW, SEC2_COLS_MAX_LEN))]
 
-    color = r"${{color " + color + r"}}"
-    LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{color}{}{color_reset}> {} {pin_flag}\n".format(
+    LINES += "   │ {}─ i{:02.0f} h{} <RX{} + TX{} = TOT{}> {} {pin_flag}".format(
         pre,
         i,
         *ROW,
-        color=color,
+        color=r"${{color " + color + r"}}",
         color_reset=r"${{color}}",
         pin_flag="&" if is_pinned else "",
     )
+    LINES += "\n" if not lf_last else ""
 
-TMP_LINES = """
+LINES += """
    │
    ├─┬─ 31 days   : {n_m_entries} entries (every 24 hours)
    │ │
@@ -352,7 +359,6 @@ TMP_LINES = """
    │
    └─── refreshed : {last_update}
 """
-LINES += TMP_LINES[1:-1]
 
 # rendering the output
 
