@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 
 from typing import TYPE_CHECKING
 
@@ -50,6 +51,9 @@ def color_gradient_generator(
 
     points_per_step = points_to_generate // (points_n - 1)
 
+    if points_per_step == 0:
+        points_per_step = 1
+
     steps = [(tuple(int(step[i : i + 2], 16) for i in (1, 3, 5))) for step in steps]
 
     gradients = []
@@ -78,3 +82,7 @@ def color_gradient_generator(
     gradients = ["#{:02X}{:02X}{:02X}".format(*gradient) for gradient in gradients]
 
     return gradients
+
+
+def execute(command: list[str]):
+    return subprocess.run(command, capture_output=True, text=True)
