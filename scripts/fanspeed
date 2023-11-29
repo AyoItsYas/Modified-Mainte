@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+
+import sys
+from core import utility
+
+if __name__ != "__main__":
+    utility.error("This script is not meant to be imported.")
+
+try:
+    import subprocess
+except ImportError:
+    utility.error("The subprocess module is not installed.")
+
+
+def extract_data(data: str):
+    res = []
+
+    cur = []
+    for line in data.split("\n")[4:]:
+        if line == "":
+            res.append(cur)
+            cur = []
+
+        cur.append(line)
+
+    for i in range(len(res)):
+        data = res[i]
+        res[i] = {
+            "name": data[0].split(":")[1],
+            "currentSpeed": float(data[3].split(":")[1]) * 1,
+            "targetSpeed": float(data[4].split(":")[1]),
+        }
+
+    return res
+
+
+OUT = subprocess.run(["nbfc", "status", "-a"], capture_output=True, text=True).stdout
+DATA = extract_data(OUT)[0]
+
+
+ramping = "+" if DATA["currentSpeed"] < DATA["targetSpeed"] else "-"
+
+DATA["currentSpeed"] = 100 if DATA["currentSpeed"] > 100 else DATA["currentSpeed"]
+
+
+bar = r"${execbar echo '" + str(DATA["currentSpeed"]) + r"' }"
+line = (
+    f"{DATA['targetSpeed']:.0f}% THRESH {ramping} {DATA['currentSpeed']:.0f}% | {bar}"
+)
+
+print(line)

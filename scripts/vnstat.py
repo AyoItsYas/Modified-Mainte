@@ -167,7 +167,7 @@ SEC1_PLACEHOLDERS = {
 
 COLORS = utility.color_gradient_generator(
     len(DATA_NO_NONE),
-    ["#dddddd", "#eee36f", "#ffe900", "#ffb000", "#ff7700", "#ff3c00"],
+    ["#dddddd", "#eee36f", "#ffe900", "#ffb000", "#ff7700"],
 )
 GROWTH_DATA = {
     h: color

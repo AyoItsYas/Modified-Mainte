@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+from core import utility
+
+if __name__ != "__main__":
+    utility.error("This script is not meant to be imported.")
+
+try:
+    import subprocess
+except ImportError:
+    utility.error("The subprocess module is not installed.")
+
+
+RADEONTOP_PID = "/tmp/radeontop.pid"
+RADEONTOP_LOG = "/tmp/radeontop.log"
+
+
+try:
+    DATA = subprocess.check_output(["tail", "-n", "1", RADEONTOP_LOG]).decode("utf-8")
+except subprocess.CalledProcessError:
+    os.system("radeontop -i 1 -d /tmp/radeontop.log")
+    utility.error("Radeontop is not running.")
+
+
+def print_vram_data():
+    vram_perc, vram_used, *_ = DATA[DATA.find("vram") : DATA.find("gtt")].split()[1:]
+    vram_clock, *_ = DATA[DATA.find("mclk") : DATA.find("sclk")].split()[2:]
+
+    vram_perc = vram_perc.strip("%")
+    vram_used = vram_used.strip(", ")
+    vram_clock = vram_clock.strip(", ")
+
+    bar = r"${execbar echo '" + str(vram_perc) + r"' }"
+    line = f"{vram_used} / 1024MB | {vram_perc:>5}% {bar} :: {vram_clock}".strip("\n")
+
+    print(line)
+
+
+def print_clock_data():
+    clock_perc, clock_speed, *_ = DATA[DATA.find("sclk") :].split()[1:]
+
+    clock_perc = clock_perc.strip("%")
+
+    bar = r"${execbar echo '" + str(clock_perc) + r"' }"
+    line = f"{clock_perc:>5} {bar} :: {clock_speed}".strip("\n")
+
+    print(line)
+
+
+MODES = {
+    "vram": print_vram_data,
+    "clock": print_clock_data,
+}
+
+
+MODES[sys.argv[1]]()

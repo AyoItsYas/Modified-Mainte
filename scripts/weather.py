@@ -163,13 +163,13 @@ n_items = len(items)
 N_COLS = 5
 ROWS, COLS_MAX_LEN = [], [0] * N_COLS
 
-TEMP_GRADIENT = sorted(
-    map(lambda x: (x[0], x[1]["main"]["temp"]), enumerate(items)), key=lambda x: x[1]
-)
-TEMP_GRADIENT = utility.color_gradient_generator(
-    100,
-    ["#DDDDDD", "#FFE900", "#FF7700"],
-)
+# TEMP_GRADIENT = sorted(
+#     map(lambda x: (x[0], x[1]["main"]["temp"]), enumerate(items)), key=lambda x: x[1]
+# )
+# TEMP_GRADIENT = utility.color_gradient_generator(
+#     100,
+#     ["#DDDDDD", "#FFE900", "#FF7700"],
+# )
 
 
 for w, forecast in enumerate(items):
@@ -202,8 +202,7 @@ for i, ROW in enumerate(items):
         TMP_LINES += "   │ │\n"
 
     connector = "├" if not is_last else "└"
-    color = TEMP_GRADIENT[round(float(ROW[1][:-2]))]
-    TMP_LINES += f"   │ {connector}─ i{i:02.0f} {ROW[0]:>{COLS_MAX_LEN[0]}} <${r'{{color '+color+r'}}'}{ROW[1]:<{COLS_MAX_LEN[1]}}${r'{{color}}'} {ROW[2]:<{COLS_MAX_LEN[2]}} {ROW[3]:>{COLS_MAX_LEN[3]}} @ {ROW[4]}>{' &' if is_fixed else ''}\n"
+    TMP_LINES += f"   │ {connector}─ i{i:02.0f} {ROW[0]:>{COLS_MAX_LEN[0]}} <{ROW[1]:<{COLS_MAX_LEN[1]}} {ROW[2]:<{COLS_MAX_LEN[2]}} {ROW[3]:>{COLS_MAX_LEN[3]}} @ {ROW[4]}>{' &' if is_fixed else ''}\n"
 
 
 LINES += TMP_LINES  # add the lines to output

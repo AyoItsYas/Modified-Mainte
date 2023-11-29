@@ -6,7 +6,7 @@ conky.config = {
     update_interval = 1,
     own_window = true,
     own_window_transparent = true,
-    own_window_type = 'dock',
+    own_window_type = 'desktop',
     own_window_class = 'Conky',
     own_window_argb_visual = true,
     own_window_argb_value = 255,
@@ -19,9 +19,9 @@ conky.config = {
     draw_graph_borders = true,
     stippled_borders = 0,
     border_width = 0,
-    default_color = 'BEC8CB',
-    default_shade_color = 'BEC8CB',
-    default_outline_color = 'BEC8CB',
+    default_color = '#BEC8CB',
+    default_shade_color = '#BEC8CB',
+    default_outline_color = '#BEC8CB',
     alignment = 'top_left',
     gap_x = 680,
     gap_y = 45,
@@ -49,10 +49,10 @@ ${alignr 115}${exec uptime | awk -F, '{print $1}' | awk '{gsub(/^ +| +$/,"")}1' 
 
 
 # Graphics Info
-${alignr 36}[3520x1080] --- Radeon R7 M365X @ 825 MHz :   gpu ─┬───────────
+${alignr 36}Radeon R7 M365X @ 0.825 GHz :   gpu ─┬───────────
 ${alignr 113}│
-${alignr 113}${execi 5 bash ./scripts/gpu-stats.sh vram } :  vram ─┤
-${alignr 113}${execi 5 bash ./scripts/gpu-stats.sh temp } --- ${execi 5 bash ./scripts/gpu-stats.sh clock } : clock ─┘
+${alignr 113}${execp ./scripts/gpu-stats vram } :  vram ─┤
+${alignr 113}${execp ./scripts/gpu-stats clock } : clock ─┘
 
 
 ${alignr 36}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ────────────┐
@@ -70,7 +70,7 @@ ${alignr 125}├─ p3 <${top name 3}   ${top cpu 3}> │
 ${alignr 125}├─ p4 <${top name 4}   ${top cpu 4}> │
 ${alignr 125}├─ p5 <${top name 5}   ${top cpu 5}> │
 ${alignr 125}└─────────────────┬───────────────┘
-${alignr 97}└─────── cpu ────────
+${alignr 97}${execpi 5 ./scripts/fanspeed } : fan ─────────────────────┴─────── cpu ────────
 ${voffset 0}
 ${alignr 75}$swap / $swapmax ${swapperc}% swap --- $mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
 ${voffset 31}
@@ -84,6 +84,6 @@ ${voffset -13}
 ${voffset 11}
 ${alignr 101}${execi 60 acpi | grep "Battery 0" | tr -d ',' } ${battery_bar 7,100 BAT0} ──── bat ────
 ${voffset 23}
-${alignr 5}[/mnt/home/]   Hitachi HTS543232A7A384 --- ${execi 3600 bash ./scripts/storage.sh /mnt/home/ } ─┬───── strg ────────
-${alignr 138}[/] SanDisk SD8SN8U-256G-1006 --- ${execi 3600 bash ./scripts/storage.sh / } ─┘
+${alignr 5}${execi 3600 bash ./scripts/storage.sh val / } ${execibar 3600 bash ./scripts/storage.sh perc / } : SanDisk SD8SN8U-256G-1006 ─┬───── strg ────────
+${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/ } :   Hitachi HTS543232A7A384 ─┘
 ]];

@@ -43,6 +43,7 @@ def convert_bytes(bytes: int, format_spec: str = ".2f") -> str:
 def color_gradient_generator(
     number: int, steps: list[str[7]] = ["#FF0000", "#00FF00", "#0000FF"]
 ) -> list[str]:
+    number += 1
     if number <= 0:
         return []
 
@@ -86,3 +87,7 @@ def color_gradient_generator(
 
 def execute(command: list[str]):
     return subprocess.run(command, capture_output=True, text=True)
+
+
+def wrap_color(text: str, color: str = "#FF0000", end: bool = True) -> str:
+    return f"${{color {color}}}{text}" + (r"${color}" if end else " ")
