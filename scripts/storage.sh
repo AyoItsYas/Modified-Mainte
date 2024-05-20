@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/env sh
 
 format_bytes() {
     awk '
@@ -12,7 +12,7 @@ format_bytes() {
         {sub(/^[0-9]+/, human($1)); print}'
 }
 
-if [ "$1" == "val" ]; then
+if [ "$1" = "val" ]; then
     OUT=$(df "$2" | tail -n 1)
 
     PERC=$(echo "$OUT" | tail -n 1 | awk '{printf "%3s", $5}')
@@ -21,7 +21,7 @@ if [ "$1" == "val" ]; then
 
     echo "$USED / $SIZE | $PERC"
     exit 0
-elif [ "$1" == "perc" ]; then
+elif [ "$1" = "perc" ]; then
     df "$2" | tail -n 1 | awk '{printf "%2.0f", $5/1}'
     exit 0
 fi

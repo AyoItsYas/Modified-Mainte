@@ -70,7 +70,7 @@ ${alignr 125}├─ p3 <${top name 3}   ${top cpu 3}> │
 ${alignr 125}├─ p4 <${top name 4}   ${top cpu 4}> │
 ${alignr 125}├─ p5 <${top name 5}   ${top cpu 5}> │
 ${alignr 125}└─────────────────┬───────────────┘
-${alignr 97}${execpi 5 ./scripts/fanspeed } : fan ─────────────────────┴─────── cpu ────────
+${alignr 97}${execpi 2 ./scripts/fanspeed } : fan ─────────────────────┴─────── cpu ────────
 ${voffset 0}
 ${alignr 75}$swap / $swapmax ${swapperc}% swap --- $mem / $memmax | $memperc% ${membar 7,100} ───── ram ────┐
 ${voffset 31}
@@ -84,6 +84,7 @@ ${voffset -13}
 ${voffset 11}
 ${alignr 101}${execi 60 acpi | grep "Battery 0" | tr -d ',' } ${battery_bar 7,100 BAT0} ──── bat ────
 ${voffset 23}
-${alignr 5}${execi 3600 bash ./scripts/storage.sh val / } ${execibar 3600 bash ./scripts/storage.sh perc / } : SanDisk SD8SN8U-256G-1006 ─┬───── strg ────────
-${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/9275c84f-279a-4dd7-b9fd-dca73b6df9a6/ } :   Hitachi HTS543232A7A384 ─┘
+${alignr 5}${execi 3600 bash ./scripts/storage.sh val / } ${execibar 3600 bash ./scripts/storage.sh perc / } :      SanDisk SD8SN8U-256G-1006 ─┬───── strg ────────
+${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/mass/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/mass/ } :        Hitachi HTS543232A7A384 ─┤
+${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/vault/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/vault/ } : Seagate Barracuda ST 1000DM010 ─┘
 ]];

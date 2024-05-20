@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 from core import utility
 
 if __name__ != "__main__":
@@ -34,7 +33,12 @@ def extract_data(data: str):
     return res
 
 
-OUT = subprocess.run(["nbfc", "status", "-a"], capture_output=True, text=True).stdout
+PROC = subprocess.run(["nbfc", "status", "-a"], capture_output=True, text=True)
+
+if PROC.returncode != 0:
+    utility.error("Failed to get fan speed data.")
+
+OUT = PROC.stdout
 DATA = extract_data(OUT)[0]
 
 
@@ -43,9 +47,7 @@ ramping = "+" if DATA["currentSpeed"] < DATA["targetSpeed"] else "-"
 DATA["currentSpeed"] = 100 if DATA["currentSpeed"] > 100 else DATA["currentSpeed"]
 
 
-bar = r"${execbar echo '" + str(DATA["currentSpeed"]) + r"' }"
-line = (
-    f"{DATA['targetSpeed']:.0f}% THRESH {ramping} {DATA['currentSpeed']:.0f}% | {bar}"
-)
+bar = r"${execbar 7,35 echo '" + str(DATA["currentSpeed"]) + r"' }"
+line = f"{DATA['targetSpeed']:.0f}% THRESH | {ramping}{DATA['currentSpeed']:.0f}% {bar}"
 
 print(line)

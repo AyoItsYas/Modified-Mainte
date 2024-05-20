@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 PLAYERS=$(playerctl -l)
 
@@ -29,12 +29,12 @@ if [[ -z "$ACTIVE_PLAYER" ]]; then
 fi
 
 if [[ $1 == "player" ]]; then
-  if [[ $ACTIVE_PLAYER =~ ^(brave) ]]; then
+  if [[ $ACTIVE_PLAYER =~ ^(vivaldi|chromium|vlc) ]]; then
     NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }}")
     WINDOW_ID=$(xdotool search --name "$NAME" | head -n 1)
 
     if [[ -z "$WINDOW_ID" ]]; then
-      ACTIVE_PLAYER_NAME="brave"
+      ACTIVE_PLAYER_NAME="NA"
     else
       ACTIVE_PLAYER_NAME=$(xdotool getwindowname "$WINDOW_ID" | awk -F ' - ' '{print $1}')
     fi
@@ -48,7 +48,7 @@ else
   if [[ $1 == "perc" ]]; then
     echo "$PERCENT" && exit 0
   else
-    if [[ $ACTIVE_PLAYER =~ ^(brave|chromium|vlc) ]]; then
+    if [[ $ACTIVE_PLAYER =~ ^(vivaldi|chromium|vlc) ]]; then
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }}")
     else
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ title }} - {{ artist }}")
@@ -58,12 +58,11 @@ else
       NAME=$(playerctl -p "$ACTIVE_PLAYER" metadata --format "{{ xesam:url }}")
     fi
 
-
     HASH=$(hash "$ACTIVE_PLAYER")
     MAX_LEN=50
 
     if [[ ! -f "/tmp/conky-media-scroll-step" ]]; then
-      echo "1" > /tmp/conky-media-scroll-step
+      echo "1" >/tmp/conky-media-scroll-step
     fi
 
     SCROLL_STEP=$(cat /tmp/conky-media-scroll-step)
@@ -71,7 +70,7 @@ else
     SCROLL_INDEX="/tmp/conky-media-scroll-index-$HASH"
 
     if [[ ! -f "$SCROLL_INDEX" ]]; then
-      echo "0" > $SCROLL_INDEX
+      echo "0" >$SCROLL_INDEX
     fi
 
     if [[ ${#NAME} -gt $MAX_LEN ]]; then
@@ -89,14 +88,14 @@ else
       fi
 
       if [[ $SCROLL -gt ${#NAME} ]]; then
-        echo "-1" > /tmp/conky-media-scroll-step
+        echo "-1" >/tmp/conky-media-scroll-step
       fi
 
       if [[ $SCROLL -lt "1" ]]; then
-        echo "+1" > /tmp/conky-media-scroll-step
+        echo "+1" >/tmp/conky-media-scroll-step
       fi
 
-      echo "$SCROLL" > $SCROLL_INDEX
+      echo "$SCROLL" >$SCROLL_INDEX
     fi
 
     META=$(playerctl -p "$ACTIVE_PLAYER_NAME" metadata --format "$NAME --- {{ duration(position) }} / {{ duration(mpris:length) }}")

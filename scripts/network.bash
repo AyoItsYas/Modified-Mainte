@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # if [ -f /tmp/ifstat.pid ]; then
 #   PID=$(cat /tmp/ifstat.pid)
@@ -54,7 +54,7 @@ if [[ $1 == "proxy" ]]; then
     DATA=$(set | grep -i proxy)
     HTTPS_PROXY=$(echo "$DATA" | grep -i HTTPS_PROXY | head -n 1)
     # split the string by '='
-    IFS='=' read -ra HTTPS_PROXY <<< "$HTTPS_PROXY"
+    IFS='=' read -ra HTTPS_PROXY <<<"$HTTPS_PROXY"
 
     if [ ${#HTTPS_PROXY[@]} -ne 2 ]; then
         echo "na"
