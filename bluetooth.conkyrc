@@ -64,5 +64,5 @@ ${offset 420}         │
 ${offset 420}         │
 ${offset 224}${exec bluetoothctl show | grep "Powered:" | awk '{printf "%3s\n", $2}' } :      Powered ─┬─ BLUETOOTH ───${offset 0}─┘
 ${offset 224}${exec bluetoothctl show | grep "Discoverable:" | awk '{printf "%3s\n", $2}' } : Discoverable ─┤
-${texeci 10 bash ./scripts/bluetooth.sh }
+${texeci 10 bash ./scripts/bluetooth }
 ]];

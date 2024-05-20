@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ─ ││ ▽▼△▲▵▴▾▿
+
+DEVICES_DATA_OUT=$(bluetoothctl devices)
+
+mapfile -t DEVICES_MAC <<<"$(echo "$DEVICES_DATA_OUT" | awk '{print $2}')"
+
+DEVICES_DATA=()
+for MAC in "${DEVICES_MAC[@]}"; do
+    DEVICE_DATA=$(bluetoothctl info "$MAC")
+
+    if [[ $DEVICE_DATA == *"Connected: yes"* ]]; then
+        DATA=()
+
+        DATA+=("$MAC")
+
+        if [[ $DEVICE_DATA == *"Battery"* ]]; then
+            DATA+=("$(echo "$DEVICE_DATA" | grep "Battery" | awk '{print $4}' | tr -d '()' | awk '{print $0"%"}')")
+        else
+            DATA+=("N/A ")
+        fi
+
+        DATA+=("$(echo "$DEVICE_DATA" | grep "Alias" | cut -d' ' -f2-)")
+
+        DEVICES_DATA+=("${DATA[@]}")
+    else
+        continue
+    fi
+done
+
+COLS=3
+ROWS=$((${#DEVICES_DATA[@]} / COLS))
+
+COL_MAX_LENS=()
+
+for ((i = 0; i < COLS; i++)); do
+    MAX_LEN=0
+
+    for ((j = 0; j < ROWS; j++)); do
+        LEN=${#DEVICES_DATA[j * COLS + i]}
+
+        if ((LEN > MAX_LEN)); then
+            MAX_LEN=$LEN
+        fi
+    done
+
+    COL_MAX_LENS+=("$MAX_LEN")
+done
+
+echo "│" | awk '{ printf "%55s\n", $0 }'
+for ((i = 0; i < ROWS; i++)); do
+    LAST=0
+    if ((i == ROWS - 1)); then
+        LAST=1
+    fi
+
+    LINE=""
+
+    for ((j = 0; j < COLS; j++)); do
+        DATA=("${DEVICES_DATA[i * COLS + j]}")
+        LEN=${#DATA}
+
+        for ((k = 0; k < COL_MAX_LENS[j] - LEN; k++)); do
+            LINE="$LINE "
+        done
+
+        LINE="$LINE ${DATA[0]}"
+    done
+
+    LINE="<${LINE:1}> B$i ─"
+
+    if ((LAST)); then
+        LINE="$LINE┘"
+    else
+        LINE="$LINE┤"
+    fi
+
+    echo "$LINE" | awk '{ printf "%57s\n", $0 }'
+done
