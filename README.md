@@ -14,6 +14,8 @@
   adb          : Android device connection status
   usbguard     : Rules to govern secure USB connections
   xdotool      : To identify window/app names from web shortcut apps (Media playback)
+  acpi         : Battery status
+  hwinfo       : Hardware information
   ```
 
 # Setting Up
