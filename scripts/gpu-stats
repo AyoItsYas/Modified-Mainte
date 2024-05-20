@@ -18,9 +18,17 @@ RADEONTOP_LOG = "/tmp/radeontop.log"
 
 
 try:
-    DATA = subprocess.check_output(["tail", "-n", "1", RADEONTOP_LOG]).decode("utf-8")
+    DATA = subprocess.check_output(
+        ["tail", "-n", "1", RADEONTOP_LOG], stderr=subprocess.DEVNULL
+    ).decode("utf-8")
 except subprocess.CalledProcessError:
-    os.system("radeontop -i 1 -d /tmp/radeontop.log")
+    try:
+        return_code = os.system(
+            "radeontop -i 1 -d /tmp/radeontop.log > /dev/null 2>&1 & echo $! > /tmp/radeontop.pid"
+        )
+    except:
+        utility.error("Failed to start radeontop.")
+
     utility.error("Radeontop is not running.")
 
 
@@ -32,10 +40,10 @@ def print_vram_data():
     vram_used = vram_used.strip(", ")
     vram_clock = vram_clock.strip(", ")
 
-    bar = r"${execbar echo '" + str(vram_perc) + r"' }"
+    bar = r"${execbar 7,75 echo '" + str(vram_perc) + r"' }"
     line = f"{vram_used} / 1024MB | {vram_perc:>5}% {bar} :: {vram_clock}".strip("\n")
 
-    print(line)
+    print(line.replace("\n", " "))
 
 
 def print_clock_data():
@@ -43,10 +51,10 @@ def print_clock_data():
 
     clock_perc = clock_perc.strip("%")
 
-    bar = r"${execbar echo '" + str(clock_perc) + r"' }"
-    line = f"{clock_perc:>5} {bar} :: {clock_speed}".strip("\n")
+    bar = r"${execbar 7,75 echo '" + str(clock_perc) + r"' }"
+    line = f"{clock_perc:>5}% {bar} :: {clock_speed}".strip("\n")
 
-    print(line)
+    print(line.replace("\n", " "))
 
 
 MODES = {
