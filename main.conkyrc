@@ -60,9 +60,9 @@ ${voffset 5}
 ${alignr 125}┌─────────────────────────────────┐
 ${alignr 125}│  ${execi 3600 cat /proc/cpuinfo | grep 'model name'| sed -e 's/model name.*: //'| uniq | cut -c 1-36 | sed 's/(R)//g'|sed 's/(TM)//g' | sed 's/CPU     //g'}  │
 ${alignr 125}├- -  --  --  --  --  --  --  -- -┤
-${alignr 125}│    core0 <${exec sensors | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
+${alignr 125}│    core0 <${exec sensors coretemp-isa-0000 | grep 'Core 0'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>  core1 <${exec sensors coretemp-isa-0000 | grep 'Core 1'| awk -F'+' '{print $2}' | awk -F'.' '{print $1}'}°C>   │
 ${alignr 125}├─────────────────────────────────┤
-${alignr 125}│ processes - ${exec printf "%-5s" $(ps -e --no-headers | wc -l)}    <${exec hwinfo --cpu | grep Clock | grep -oE '[0-9]+' | awk '{ sum += $1 } END { avg = sum / NR / 1000; printf "%4.2f GHz\n", avg }'}> │
+${alignr 125}│ processes - ${exec printf "%-5s" $(ps -e --no-headers | wc -l)}    <${exec cat /proc/cpuinfo | grep MHz | grep -oE '[0-9]+' | awk '{ sum += $1 } END { avg = sum / NR / 1000; printf "%4.2f GHz\n", avg }'}> │
 ${alignr 125}├- --  --  --  --  -- --  --  -- -┤
 ${alignr 125}├─ p1 <${top name 1}   ${top cpu 1}> │
 ${alignr 125}├─ p2 <${top name 2}   ${top cpu 2}> │

@@ -18,7 +18,7 @@ for MAC in "${DEVICES_MAC[@]}"; do
         if [[ $DEVICE_DATA == *"Battery"* ]]; then
             DATA+=("$(echo "$DEVICE_DATA" | grep "Battery" | awk '{print $4}' | tr -d '()' | awk '{print $0"%"}')")
         else
-            DATA+=("N/A ")
+            DATA+=("N/A")
         fi
 
         DATA+=("$(echo "$DEVICE_DATA" | grep "Alias" | cut -d' ' -f2-)")
@@ -29,8 +29,15 @@ for MAC in "${DEVICES_MAC[@]}"; do
     fi
 done
 
+echo "│" | awk '{ printf "%55s\n", $0 }'
+
 COLS=3
 ROWS=$((${#DEVICES_DATA[@]} / COLS))
+
+if ((ROWS == 0)); then
+    echo "- - ┴ - -" | awk '{ printf "%59s\n", $0 }'
+    exit 0
+fi
 
 COL_MAX_LENS=()
 
@@ -48,7 +55,6 @@ for ((i = 0; i < COLS; i++)); do
     COL_MAX_LENS+=("$MAX_LEN")
 done
 
-echo "│" | awk '{ printf "%55s\n", $0 }'
 for ((i = 0; i < ROWS; i++)); do
     LAST=0
     if ((i == ROWS - 1)); then
