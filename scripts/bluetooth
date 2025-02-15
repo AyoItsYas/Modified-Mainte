@@ -29,13 +29,13 @@ for MAC in "${DEVICES_MAC[@]}"; do
     fi
 done
 
-echo "│" | awk '{ printf "%55s\n", $0 }'
+echo "│" | awk '{ printf "%53s\n", $0 }'
 
 COLS=3
 ROWS=$((${#DEVICES_DATA[@]} / COLS))
 
 if ((ROWS == 0)); then
-    echo "- - ┴ - -" | awk '{ printf "%59s\n", $0 }'
+    echo "- - ┴ - -" | awk '{ printf "%57s\n", $0 }'
     exit 0
 fi
 

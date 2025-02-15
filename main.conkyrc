@@ -55,7 +55,7 @@ ${alignr 113}${execp ./scripts/gpu-stats vram } :  vram ─┤
 ${alignr 113}${execp ./scripts/gpu-stats clock } : clock ─┘
 
 
-${alignr 36}${execi 600 cat /etc/default/locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ────────────┐
+${alignr 36}${execi 600 locale | grep "LANG=" | cut -d"\"" -f2 | sed 's/LANG=//g'} : locale ────────────┐
 ${voffset 5}
 ${alignr 125}┌─────────────────────────────────┐
 ${alignr 125}│  ${execi 3600 cat /proc/cpuinfo | grep 'model name'| sed -e 's/model name.*: //'| uniq | cut -c 1-36 | sed 's/(R)//g'|sed 's/(TM)//g' | sed 's/CPU     //g'}  │

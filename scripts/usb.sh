@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 # leet chars: ┤┤└ └ ┴ ┴ ┐┐│ │┘ ┘┌ ┌ ├ ├ ┬ ┬ ┼ ┼ ┴ ┴ ── ││ ▽▼△▲▵▴▾▿
 
@@ -8,11 +8,11 @@ DEVICESN=$(echo "$OUT" | wc -l)
 
 USBGUARD_OUTPUT=$(usbguard list-devices)
 
-if [ $DEVICESN -lt 10 ]; then
+if [ "$DEVICESN" -lt 10 ]; then
   FILL=1
-elif [ $DEVICESN -lt 100 ]; then
+elif [ "$DEVICESN" -lt 100 ]; then
   FILL=2
-elif [ $DEVICESN -lt 1000 ]; then
+elif [ "$DEVICESN" -lt 1000 ]; then
   FILL=3
 else
   FILL=4
@@ -20,29 +20,29 @@ fi
 
 MAXLEN=0
 while read -r line; do
-  IFS=' ' read -r -a array <<< "$line"
+  IFS=' ' read -r -a array <<<"$line"
 
   DEVICE_NAME=$(echo "$line" | awk '{for(i=7;i<=NF;++i)printf $i""FS;print""}')
   LEN=${#DEVICE_NAME}
 
-  if [ $LEN -gt $MAXLEN ]; then
+  if [ "$LEN" -gt "$MAXLEN" ]; then
     MAXLEN=$LEN
   fi
-done <<< "$OUT"
+done <<<"$OUT"
 
 i=1
-while [ $i -le $BUSN ]; do
+while [ $i -le "$BUSN" ]; do
   if [ $i -eq 1 ]; then
     :
   else
-    echo "│" | awk '{ printf "%109s\n", $0 }'
+    echo "│" | awk '{ printf "%119s\n", $0 }'
   fi
   DEVICESN=$(echo "$OUT" | grep "Bus 00$i" | wc -l)
 
   PRE="┤"
   if [ $i -eq 1 ]; then
     PRE="┬"
-  elif [ $i -eq $BUSN ]; then
+  elif [ $i -eq "$BUSN" ]; then
     PRE="┘"
   fi
 
@@ -53,20 +53,20 @@ while [ $i -le $BUSN ]; do
 
   j=1
   while read -r line; do
-    IFS=' ' read -r -a array <<< "$line"
+    IFS=' ' read -r -a array <<<"$line"
 
     CN_PRE="│"
-    if [ $i -eq $BUSN ]; then
-      CN_PRE="   "
+    if [ $i -eq "$BUSN" ]; then
+      CN_PRE=" "
     fi
 
     PRE="┤"
-    if [ $j -eq $DEVICESN ]; then
+    if [ $j -eq "$DEVICESN" ]; then
       PRE="┘"
     fi
 
     DEVICE_NAME=$(echo "$line" | awk '{for(i=7;i<=NF;++i)printf $i""FS;print""}')
-    DEVICE_NAME="$(printf "%"$MAXLEN"s" "$DEVICE_NAME" | sed -e 's/[[:space:]]*$//')"
+    DEVICE_NAME="$(printf "%${MAXLEN}s" "$DEVICE_NAME" | sed -e 's/[[:space:]]*$//')"
 
     k=$(printf "%0${FILL}d" $j)
 
@@ -80,17 +80,16 @@ while [ $i -le $BUSN ]; do
       USBGUARD_STATUS="blocked"
     fi
 
-    echo "<${array[5]} $DEVICE_NAME $COLOR$USBGUARD_STATUS\${color}> D$k ─$PRE           $CN_PRE" | awk '{ printf "%137s\n", $0 }'
-    sleep 0.05
+    echo "<${array[5]} $DEVICE_NAME $COLOR$USBGUARD_STATUS\${color}> D$k ─$PRE           $CN_PRE" | awk '{ printf "%143s\n", $0 }'
 
-    if [ $j -eq $DEVICESN ]; then
+    if [ $j -eq "$DEVICESN" ]; then
       break
     fi
 
-    j=$((j+1))
-  done <<< "$BUS_DEVICES"
+    j=$((j + 1))
+  done <<<"$BUS_DEVICES"
 
-  i=$((i+1))
+  i=$((i + 1))
 done
 
 exit 0

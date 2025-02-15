@@ -24,10 +24,15 @@ def extract_data(data: str):
 
     for i in range(len(res)):
         data = res[i]
+        auto = "man"
+        if data[1].split(":")[1].strip() == "true":
+            auto = "auto"
+
         res[i] = {
             "name": data[0].split(":")[1],
             "currentSpeed": float(data[3].split(":")[1]) * 1,
             "targetSpeed": float(data[4].split(":")[1]),
+            "auto": auto,
         }
 
     return res
@@ -48,6 +53,6 @@ DATA["currentSpeed"] = 100 if DATA["currentSpeed"] > 100 else DATA["currentSpeed
 
 
 bar = r"${execbar 7,35 echo '" + str(DATA["currentSpeed"]) + r"' }"
-line = f"{DATA['targetSpeed']:.0f}% THRESH | {ramping}{DATA['currentSpeed']:.0f}% {bar}"
+line = f"{DATA['auto']} {DATA['targetSpeed']:.0f}% THRESH | {ramping}{DATA['currentSpeed']:.0f}% {bar}"
 
 print(line)
