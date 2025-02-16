@@ -84,7 +84,6 @@ ${voffset -13}
 ${voffset 11}
 ${alignr 101}${execi 60 acpi | grep "Battery 0" | tr -d ',' } ${battery_bar 7,100 BAT0} ──── bat ────
 ${voffset 23}
-${alignr 5}${execi 3600 bash ./scripts/storage.sh val / } ${execibar 3600 bash ./scripts/storage.sh perc / } :      SanDisk SD8SN8U-256G-1006 ─┬───── strg ────────
-${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/mass/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/mass/ } :        Hitachi HTS543232A7A384 ─┤
-${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/vault/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/vault/ } : Seagate Barracuda ST 1000DM010 ─┘
+${alignr 5}${execi 3600 bash ./scripts/storage.sh val / } ${execibar 3600 bash ./scripts/storage.sh perc / } : /dev/SDB - SanDisk SD8SN8U-256G-1006 ─┬───── strg ────────
+${alignr 138}${execi 3600 bash ./scripts/storage.sh val /mnt/mass/ } ${execibar 3600 bash ./scripts/storage.sh perc /mnt/mass/ } : /dev/SDA -   Hitachi HTS543232A7A384 ─┘
 ]];

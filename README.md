@@ -16,6 +16,7 @@
   xdotool      : To identify window/app names from web shortcut apps (Media playback)
   acpi         : Battery status
   hwinfo       : Hardware information
+  bc           : For floating point arithmetic
   ```
 
 # Setting Up

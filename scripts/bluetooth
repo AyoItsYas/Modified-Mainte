@@ -82,5 +82,5 @@ for ((i = 0; i < ROWS; i++)); do
         LINE="$LINE┤"
     fi
 
-    echo "$LINE" | awk '{ printf "%57s\n", $0 }'
+    echo "$LINE" | awk '{ printf "%53s\n", $0 }'
 done
